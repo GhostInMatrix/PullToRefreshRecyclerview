@@ -1,6 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="colorPrimary">#3F51B5</color>
-	<color name="colorPrimaryDark">#303F9F</color>
-	<color name="colorAccent">#FF4081</color>
+	<!--app中通用颜色,避免重复定义-->
+	<color name="main_blue">#2c96ef</color>     <!--蓝-->
+	<color name="main_yellow">#ffab47</color>   <!--黄-->
+	<color name="main_red">#f05463</color>      <!--红-->
+	<color name="main_green">#11c6a5</color>    <!--绿-->
+	<color name="main_grey">#e5e5e5</color>     <!--灰-->
+	<color name="main_orange">#fffec047</color>  <!--橙-->
+	<color name="main_dark_blue">#2887d7</color> <!--深蓝-->
+	<color name="main_dark_red">#d84b59</color>  <!--深红-->
+
+	<!--常用色-->
+	<color name="white">#ffffff</color>         <!--白色-->
+	<color name="grey">#cccccc</color>          <!--灰色-->
+
+	<!--提示条-->
+	<color name="bar_yellow">#fff8e8</color>
+
+	<color name="font_color_main_n">#333333</color> <!--标题 正文-->
+	<color name="font_color_main_l">#666666</color> <!--辅助-->
+	<color name="font_color_main_m">#999999</color> <!--辅助-->
+	<color name="font_color_main_d">#cccccc</color> <!--弱提示-->
+	<!--不复用的颜色不建议定义在color文件中-->
+
+
+	<!-- common start -->
+	<color name="com_bg_gray">#f5f5f5</color>
+	<color name="com_bg_bar">#fff8e8</color>
+	<color name="font_color_bar_n">#ffab47</color>
+	<color name="divider_n">#e5e5e5</color>
+	<color name="divider_bar">#ffd5a3</color>
+	<!-- common end -->
+
+
+	<!-- drawable start -->
+	<drawable name="transparent">#00FFFFFF</drawable>
+	<drawable name="blue_n">#ff228fea</drawable>
+	<!-- drawable end -->
+
+	<!-- common start -->
+	<color name="transparent">#00FFFFFF</color>
+	<color name="translucent">#70000000</color>
+
+
+	<color name="black">#000000</color>
+	<color name="p_black_80">#cc000000</color>
+	<color name="p_black_50">#7f000000</color>
+
+	<color name="green">#ff11c6a5</color>
+	<color name="green_light">#ff4ed5b2</color>
+	<color name="green_dark">#ff8dd043</color>
+	<color name="orange">#ffffab47</color>
+	<color name="orange_light">#fffec047</color>
+	<color name="orange_dark">#ffed8800</color>
+	<color name="yellow">#fef8c2</color>
+	<color name="blue">#ff2c96ef</color>
+	<color name="blue_light">#ff6db3e7</color>
+	<color name="blue_light_transparent">#cc6db3e7</color>
+
+	<color name="new_blue">#ff2c96ef</color>
+	<color name="red">#fff05463</color>
+	<color name="red_light">#ffff5b5a</color>
+	<color name="grey_dark">#ff666666</color>
+
+	<color name="com_dialog_btn_p">#cccccc</color>
+
+	<color name="com_list_selector_p">#f5f8f9</color>
+	<color name="com_list_selector_blue">#f4faff</color>
+	<color name="com_list_selector_d">#f5f5f5</color>
+
+	<color name="com_text_color_n">#333333</color>
+	<color name="com_text_color_z">#666666</color>
+	<color name="com_text_color_s">#228fea</color>
+	<color name="com_text_color_g">#11c6a5</color>
+	<color name="com_text_color_y">#ff9600</color>
+	<color name="com_text_color_r">#f05463</color>
+	<!-- common end -->
+
+	<!-- divider start -->
+	<color name="common_item_divider">#e5e5e5</color>
+	<!-- divider end -->
+
+	<!-- tips start -->
+	<color name="com_tips_1">#fff8e8</color>
+	<color name="com_tips_2">#f9b951</color>
+	<!-- tips end -->
+
+	<!-- pop shop status start -->
+	<color name="pop_shop_status_item_n">#333333</color>
+	<color name="pop_shop_status_item_s">#228fea</color>
+	<!-- pop shop status end -->
+
+	<!-- title top start -->
+	<color name="title_top">#333333</color>
+	<color name="title_top_s">#228fea</color>
+	<color name="title_top_n">#cccccc</color>
+	<!-- title top end -->
+
+	<!-- pager start -->
+	<color name="pager_title_s">#228fea</color>
+	<color name="pager_title_n">#b6b7b7</color>
+	<!-- pager end -->
+
+	<!-- login start -->
+	<color name="login_text_blue">#228fea</color>
+	<color name="login_text_black">#999999</color>
+	<!-- login end -->
+
+
+	<!-- manager start -->
+	<color name="manager_text_shop_addtimes">#228fea</color>
+	<color name="progressbar_progress">#218EE9</color>
+	<color name="progressbar_bg">#CBCBCB</color>
+	<color name="shop_status_servering">#00AA5E</color>
+	<color name="shop_status_reset">#FEBC49</color>
+	<color name="shop_status_stop">#F14E38</color>
+	<!-- manager end -->
+
+	<!-- settings printer start-->
+	<color name="lighter_gray">#ddd</color>
+	<color name="more_lighter_gray">#f0f1f1</color>
+	<color name="darker_gray">#aaa</color>
+	<color name="common_item_bg_enalbed_light_color">#D0D1D2</color>
+	<color name="common_item_text_title">#333333</color>
+	<color name="common_item_text_subtitle">#999999</color>
+	<color name="filter_item_text_title">#808080</color>
+	<color name="common_item_text_status_light">#228fea</color>
+	<color name="common_edit_hit_color">#bbbbbb</color>
+	<!-- settings printer end-->
+
+	<!-- coupon start -->
+	<color name="coupon_text_yellow">#ffab47</color>
+	<color name="coupon_text_green">#11c6a5</color>
+	<color name="coupon_text_blue">#228fea</color>
+	<color name="coupon_text_red">#f05463</color>
+	<color name="coupon_city_background">#f1f1f1</color>
+	<!-- coupon end -->
+
+	<color name="btn_unable_text">#999999</color>
+	<color name="btn_enable_text">#228fea</color>
+	<!-- evaluate_result -->
+	<color name="evaluate_time_gray">#999999</color>
+
+	<color name="btn_off_line">#f05463</color>
+	<color name="card_num_color">#ffab47</color>
+	<color name="card_num_light_color">#fff8e8</color>
+	<color name="order_info_view_text_blue">#228fea</color>
+
+	<color name="error_msg">#FF2d4b</color>
+	<color name="hot_search_text">#4d4d4d</color>
+	<color name="custom_line">#e8e6e6</color>
+
+	<!--skin style-->
+	<color name="chinese_red">#f5462c</color>
+
+
 </resources>

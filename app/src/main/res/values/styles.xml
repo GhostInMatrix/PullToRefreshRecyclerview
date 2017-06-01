@@ -1,11 +1,177 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- application start -->
+	<style name="AppTheme" parent="android:Theme.Light.NoTitleBar">
+	</style>
+	<!-- application end -->
 
-	<!-- Base application theme. -->
-	<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-		<!-- Customize your theme here. -->
-		<item name="colorPrimary">@color/colorPrimary</item>
-		<item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-		<item name="colorAccent">@color/colorAccent</item>
+	<!-- common style start -->
+	<style name="common_border_style">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">@dimen/common_item_divider</item>
+		<item name="android:background">@color/common_item_divider</item>
+	</style>
+	<!-- common style end -->
+
+	<!-- Settings printer start -->
+	<style name="common_item_text_style">
+		<item name="android:singleLine">true</item>
+		<item name="android:layout_marginLeft">@dimen/common_item_margin_left</item>
+		<item name="android:layout_gravity">left|center</item>
+		<item name="android:duplicateParentState">true</item>
+		<item name="android:textColor">@color/common_item_text_title</item>
+		<item name="android:textSize">@dimen/common_item_title_size</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">left|center</item>
 	</style>
 
+	<style name="common_item_text_tip_style">
+		<item name="android:singleLine">true</item>
+		<item name="android:layout_marginLeft">@dimen/common_item_margin</item>
+		<item name="android:layout_gravity">left|center</item>
+		<item name="android:duplicateParentState">true</item>
+		<item name="android:textColor">@color/white</item>
+		<item name="android:textSize">@dimen/common_item_title</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">left|center</item>
+	</style>
+
+	<style name="common_item_text_tel_style">
+		<item name="android:singleLine">true</item>
+		<item name="android:layout_marginLeft">@dimen/common_item_margin_tel</item>
+		<item name="android:layout_gravity">right|center</item>
+		<item name="android:duplicateParentState">true</item>
+		<item name="android:layout_alignParentRight">true</item>
+		<item name="android:textColor">@color/common_item_text_subtitle</item>
+		<item name="android:textSize">@dimen/common_item_phone_14sp</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">right|center</item>
+	</style>
+
+	<style name="common_item_text_status_style">
+		<item name="android:layout_marginRight">@dimen/common_item_margin_tel</item>
+		<item name="android:duplicateParentState">true</item>
+		<item name="android:singleLine">true</item>
+		<item name="android:textColor">@color/common_item_text_subtitle</item>
+		<item name="android:textSize">@dimen/common_item_subtitle</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">right|center</item>
+	</style>
+
+	<style name="common_item_text_subtitle">
+		<item name="android:duplicateParentState">true</item>
+		<item name="android:textColor">@color/common_item_text_subtitle</item>
+		<item name="android:textSize">@dimen/common_item_subtitle</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">left|center_vertical</item>
+		<item name="android:layout_marginLeft">@dimen/common_item_margin</item>
+		<item name="android:layout_marginRight">@dimen/common_item_margin</item>
+		<item name="android:layout_marginTop">@dimen/setting_bluetooth_tickets_icon_magin</item>
+	</style>
+	<!-- Settings printer end -->
+
+	<style name="common_item_text_time_from_to">
+		<item name="android:textColor">@color/common_item_text_subtitle</item>
+		<item name="android:textSize">@dimen/common_item_title</item>
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:gravity">center</item>
+	</style>
+
+	<style name="shop_manager_edit_phone">
+		<item name="android:textColor">@color/manager_text_shop_addtimes</item>
+		<item name="android:textSize">@dimen/shop_manager_business_edit_phone_size</item>
+		<item name="android:gravity">center</item>
+	</style>
+
+	<style name="dialog" parent="@android:style/Theme.Dialog">
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:colorBackgroundCacheHint">@null</item>
+		<!-- Note that we use the base animation style here (that is no
+			 animations) because we really have no idea how this kind of
+			 activity will be used. -->
+		<item name="android:windowAnimationStyle">@android:style/Animation</item>
+	</style>
+	<!-- Manager end -->
+
+	<!-- merchant level start -->
+	<style name="MerchantLevelTitle">
+		<item name="android:gravity">center_vertical</item>
+		<item name="android:textSize">@dimen/font_size_50</item>
+		<item name="android:textColor">@color/com_text_color_n</item>
+		<item name="android:singleLine">true</item>
+	</style>
+
+	<style name="MerchantLevelDes">
+		<item name="android:textSize">@dimen/font_size_44</item>
+		<item name="android:textColor">@color/login_text_black</item>
+	</style>
+
+	<style name="loading_dialog">
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:windowFrame">@null</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsFloating">true</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowContentOverlay">@null</item>
+		<item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+		<item name="android:backgroundDimEnabled">true</item>
+	</style>
+
+	<style name="loading_progress" parent="@android:style/Widget.ProgressBar">
+		<item name="android:indeterminateBehavior">repeat</item>
+		<item name="android:indeterminateDrawable">@drawable/anim_loading_rotate</item>
+		<item name="android:background">@color/transparent</item>
+	</style>
+
+	<style name="guest_seeker_report">
+		<item name="android:textColor">@color/font_color_main_l</item>
+		<item name="android:textSize">12dp</item>
+	</style>
+
+	<style name="ImageDialog" parent="@android:style/Theme.Dialog">
+		<item name="android:windowFrame">@null</item>
+		<item name="android:windowIsFloating">true</item>
+		<item name="android:windowIsTranslucent">false</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:backgroundDimEnabled">true</item>
+	</style>
+
+	<style name="Theme_Transparent">
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:colorForeground">#fff</item>
+	</style>
+
+
+	<style name="Theme.Start" parent="android:Theme">
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowBackground">@android:color/transparent</item>
+	</style>
+
+
+
+	<style name="Anim_fade" parent="android:Theme.NoTitleBar">
+		<item name="android:windowAnimationStyle">@style/fade</item>
+	</style>
+	<style name="fade" parent="@android:style/Animation.Activity">
+		<item name="android:activityOpenEnterAnimation">@anim/fade_in</item>
+		<item name="android:activityOpenExitAnimation">@anim/fade_out</item>
+		<item name="android:activityCloseEnterAnimation">@anim/fade_in</item>
+		<item name="android:activityCloseExitAnimation">@anim/fade_out</item>
+	</style>
+
+	<style name="popwin_anim_style">
+		<item name="android:windowEnterAnimation">@anim/dialog_view_in_anim</item>
+		<item name="android:windowExitAnimation">@anim/dialog_view_out_anim</item>
+	</style>
 </resources>
