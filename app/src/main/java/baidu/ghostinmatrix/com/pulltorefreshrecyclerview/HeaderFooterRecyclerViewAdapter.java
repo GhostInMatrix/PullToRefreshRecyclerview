@@ -90,7 +90,7 @@ public class HeaderFooterRecyclerViewAdapter extends RecyclerView.Adapter implem
     public void onItemDismiss(int position) {
         if (isHeaderPosition(position) || isFooterPosition(position))
             return;
-        ((ItemTouchHelperAdapter) mInnerAdapter).onItemDismiss(position);
+        ((ItemTouchHelperAdapter) mInnerAdapter).onItemDismiss(position - mHeaderViews.size());
         notifyItemRemoved(position);
     }
 

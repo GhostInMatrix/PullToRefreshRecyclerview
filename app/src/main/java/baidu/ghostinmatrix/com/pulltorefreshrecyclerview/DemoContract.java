@@ -8,6 +8,7 @@ import java.util.List;
 public interface DemoContract {
     interface PresenterContract {
         void getData();
+        void loadData();
     }
 
     interface ViewContract {
