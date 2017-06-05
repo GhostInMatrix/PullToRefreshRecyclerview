@@ -356,8 +356,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                 } else
                     mEvents = 0;
                 lastY = ev.getY();
-                radio = (float) (2 + 2 * Math.tan(Math.PI / 2 / getMeasuredHeight()
-                        * (pullDownY + Math.abs(pullUpY))));
+                radio = (float) (2 + 2 * Math.tan(Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
                 requestLayout();
                 if (pullDownY <= refreshDist && state == RELEASE_TO_REFRESH) {
                     changeState(INIT);

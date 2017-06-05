@@ -12,12 +12,10 @@ import android.view.ViewGroup;
  */
 public class ComViewHolder extends RecyclerView.ViewHolder {
     private SparseArrayCompat<View> mViews;
-    private Context mContext;
     private View mConvertView;
 
     public ComViewHolder(Context context, View itemView, ViewGroup parent) {
         super(itemView);
-        mContext = context;
         mConvertView = itemView;
         mViews = new SparseArrayCompat<>();
     }
@@ -27,6 +25,12 @@ public class ComViewHolder extends RecyclerView.ViewHolder {
         return new ComViewHolder(context, itemView, parent);
     }
 
+    /**
+     * 缓存+提取
+     * @param layoutId
+     * @param <T>
+     * @return
+     */
     public <T extends View> T getView(int layoutId) {
         View view = mViews.get(layoutId);
         if (view == null) {
@@ -35,5 +39,4 @@ public class ComViewHolder extends RecyclerView.ViewHolder {
         }
         return (T) view;
     }
-
 }
