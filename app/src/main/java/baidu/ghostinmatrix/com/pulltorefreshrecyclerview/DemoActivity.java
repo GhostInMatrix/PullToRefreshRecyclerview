@@ -57,10 +57,8 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         innerAdapter.setGroup(data);
         mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();
-        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
+//        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
         mRecyclerView.loadmoreFinish(PullToRefreshLayout.DONE);
-//        innerAdapter.setGroup(data);
-//        ((HeaderFooterRecyclerViewAdapter) mRecyclerView.getPullableRecyclerView().getAdapter()).setGroup(data);
     }
 
     @Override

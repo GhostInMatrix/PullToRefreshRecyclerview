@@ -33,16 +33,17 @@ public class DemoPresenter implements DemoContract.PresenterContract {
 
     @Override
     public void loadData() {
-        titles.add("title11");
-        titles.add("title12");
-        titles.add("title13");
-        titles.add("title14");
-        titles.add("title15");
-        titles.add("title16");
-        titles.add("title17");
-        titles.add("title18");
-        titles.add("title19");
-        titles.add("title20");
+        int n = titles.size()/10;
+        titles.add("title"+n+"1");
+        titles.add("title"+n+"2");
+        titles.add("title"+n+"3");
+        titles.add("title"+n+"4");
+        titles.add("title"+n+"5");
+        titles.add("title"+n+"6");
+        titles.add("title"+n+"7");
+        titles.add("title"+n+"8");
+        titles.add("title"+n+"9");
+        titles.add("title"+(n+1)+"0");
         mViewContract.onDataCome(titles, NetStateView.DATA_STATUS_NORMAL);
     }
 }

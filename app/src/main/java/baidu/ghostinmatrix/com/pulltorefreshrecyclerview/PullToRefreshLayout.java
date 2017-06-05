@@ -60,7 +60,7 @@ public class PullToRefreshLayout extends RelativeLayout {
 
         @Override
         public void handleMessage(Message msg) {
-            Log.e("timer","running");
+            Log.e("timer", "running");
             if (!canceled) {
                 MOVE_SPEED = (float) (8 + 5 * Math.tan(Math.PI / 2
                         / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
@@ -68,14 +68,12 @@ public class PullToRefreshLayout extends RelativeLayout {
                     if (state == REFRESHING && pullDownY <= refreshDist) {
                         pullDownY = refreshDist;
                         timer.cancel();
-                        Log.e("timer", "init");
-
+                        Log.e("timer", "state == REFRESHING && pullDownY <= refreshDist");
                         canceled = true;
                     } else if (state == LOADING && -pullUpY <= loadmoreDist) {
                         pullUpY = -loadmoreDist;
                         timer.cancel();
-
-                        Log.e("timer", "init");
+                        Log.e("timer", "state == LOADING && -pullUpY <= loadmoreDist");
 
                         canceled = true;
                     }
@@ -92,7 +90,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                         changeState(INIT);
                     }
                     timer.cancel();
-                    Log.e("timer", "init");
+                    Log.e("timer", "state != REFRESHING && state != LOADING");
 
                 }
                 if (pullUpY > 0) {
@@ -101,24 +99,21 @@ public class PullToRefreshLayout extends RelativeLayout {
                         changeState(INIT);
                     }
                     timer.cancel();
-                    Log.e("timer", "init");
-
+                    Log.e("timer", "state != REFRESHING && state != LOADING");
                 }
-
-//
 
                 if ((pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)) {
                     changeState(INIT);
                     timer.cancel();
-                    Log.e("timer", "init");
+                    Log.e("timer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
 
                 }
 
                 if (state == DONE) {
-                    if (pullDownY == 0) {
+                    if (pullDownY == 0 && pullUpY == 0) {
                         changeState(INIT);
                         timer.cancel();
-                        Log.e("timer", "cancel");
+                        Log.e("timer", "pullDownY == 0 && pullUpY == 0");
                     }
                 }
                 requestLayout();
@@ -223,8 +218,10 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     public void loadmoreFinish(int refreshResult) {
-        mRefreshingView.clearAnimation();
-        mLoadingView.setVisibility(View.GONE);
+        if (mLoadingView == null)
+            return;
+//        mRefreshingView.clearAnimation();
+//        mLoadingView.setVisibility(View.GONE);
         switch (refreshResult) {
             case SUCCEED:
                 break;
@@ -382,10 +379,10 @@ public class PullToRefreshLayout extends RelativeLayout {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (pullDownY > refreshDist || -pullUpY > loadmoreDist){
+                if (pullDownY > refreshDist || -pullUpY > loadmoreDist) {
                     isTouch = false;
                     hide();
-                } else if(pullDownY>0 || -pullUpY >0){
+                } else if (pullDownY > 0 || -pullUpY > 0) {
                     hide();
                 }
                 if (state == RELEASE_TO_REFRESH) {
