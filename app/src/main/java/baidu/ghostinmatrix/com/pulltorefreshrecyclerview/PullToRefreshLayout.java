@@ -106,7 +106,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                     changeState(INIT);
                     timer.cancel();
                     Log.e("timer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
-
                 }
 
                 if (state == DONE) {
@@ -220,8 +219,6 @@ public class PullToRefreshLayout extends RelativeLayout {
     public void loadmoreFinish(int refreshResult) {
         if (mLoadingView == null)
             return;
-//        mRefreshingView.clearAnimation();
-//        mLoadingView.setVisibility(View.GONE);
         switch (refreshResult) {
             case SUCCEED:
                 break;
@@ -396,13 +393,9 @@ public class PullToRefreshLayout extends RelativeLayout {
                         mListener.onLoadMore(this);
                     hide();
                 }
-
-//                hide();
-
             default:
                 break;
         }
-//        return super.onTouchEvent(ev);
         return true;
     }
 
