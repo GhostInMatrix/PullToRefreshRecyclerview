@@ -12,6 +12,7 @@ public interface DemoContract {
     }
 
     interface ViewContract {
-        void onDataCome(List<String> data, int netState);
+        void onDataRefresh(List<String> data, int netState);
+        void onDataLoad(List<String> data, int netState);
     }
 }

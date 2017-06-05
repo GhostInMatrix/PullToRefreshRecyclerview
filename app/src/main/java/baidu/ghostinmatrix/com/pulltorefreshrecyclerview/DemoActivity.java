@@ -53,11 +53,18 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
     }
 
     @Override
-    public void onDataCome(List<String> data, int netState) {
+    public void onDataRefresh(List<String> data, int netState) {
         innerAdapter.setGroup(data);
         mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();
-//        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
+        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
+    }
+
+    @Override
+    public void onDataLoad(List<String> data, int netState) {
+        innerAdapter.setGroup(data);
+        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
+        mRecyclerView.getAdapter().notifyDataSetChanged();
         mRecyclerView.loadmoreFinish(PullToRefreshLayout.DONE);
     }
 
