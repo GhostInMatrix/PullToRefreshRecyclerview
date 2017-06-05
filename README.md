@@ -205,3 +205,277 @@ public interface Pullable {
 
 PullToRefreshRecyclerView 初始化直接使用的是xml布局渲染的方式，定制了一套header和footer布局。merge之后，该类本身即为xml布局文件中三个子view的父布局。因此在PullToRefreshLayout首次onLayout获取子view的时候即可拿到对应内容。
 
+#打造高效通用RecyclerView.Adapter及ViewHolder
+
+
+在使用RecyclerView的过程中，每一个列表Adapter，每一个样式都要重新编写对应的ViewHolder，去重新实现一遍onCreateViewHolder、onBindViewHolder等方法，这样做实在是劳心费神，非常麻烦。况且，当你希望在RecyclerView中加入动画的时候，（如：左右横滑，长按拖动，置顶，删除等）会发现还需要继承实现ItemTouchHelper.Callback（如果你知道要用它的话），再自行处理其中的dataset相关的变更逻辑，那简直是雪上加霜啊。为解决这些痛点，我们要对RecyclerView.ViewHolder、RecyclerView.Adapter进行封装，做到在绝大多数情况下，一次编写，到处复用。
+
+1.通用ViewHolder
+如何能做到通用呢？即不再需要定制ViewHolder，甚至不再需要在你的代码中new出任何ViewHolder，在用到ViewHolder中的任何一个控件都不用再每次都使用```convertView.findViewById(id)```，因为即便ViewHolder中的布局很简单，也会有性能损耗（想想findViewById的原理）。但做到这两点优化并不难：ViewHolder的设计初衷就是缓存布局文件的各个控件，方便查找和设置内容。因此我们在遵循该初衷的基础上更进一步，传入**layoutId**，在ViewHolder初始化时渲染好ItemView；设置缓存机制（使用SparseArray，int-Obj 对应的映射表），即在ViewHolder内部就能直接获取到并返回所需要用到的每一个控件，这样就完成了ComViewHolder的封装，代码如下。
+
+
+```
+public class ComViewHolder extends RecyclerView.ViewHolder {
+    private SparseArrayCompat<View> mViews;
+    private View mConvertView;
+
+    public ComViewHolder(Context context, View itemView, ViewGroup parent) {
+        super(itemView);
+        mConvertView = itemView;
+        mViews = new SparseArrayCompat<>();
+    }
+
+    public static ComViewHolder getComViewHolder(Context context, int layoutId, ViewGroup parent) {
+        View itemView = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        return new ComViewHolder(context, itemView, parent);
+    }
+
+    /**
+     * 缓存+提取
+     * @param layoutId
+     * @param <T>
+     * @return
+     */
+    public <T extends View> T getView(int layoutId) {
+        View view = mViews.get(layoutId);
+        if (view == null) {
+            view = mConvertView.findViewById(layoutId);
+            mViews.put(layoutId, view);
+        }
+        return (T) view;
+    }
+}
+```
+
+
+2.ComRecyclerViewAdapter
+通用的Adapter，在使用上述ComViewHolder之后，就避免了手写onCreateViewHolder（）和onBindViewHolder（）方法的处境，取而代之的是暴露一个虚方法convert（）给业务代码，在convert（）方法中进行对应item的控件操作。由于ComViewHolder提供了静态方法```getComViewHolder（context，layoutId，viewGroup）```并返回ComViewHolder实例，因此在Adapter在任何需要初始化ViewHolder场景的情况下，都能直接使用getComViewHolder。相关方法实现如下：
+
+
+```
+    //init
+    protected List<E> mGroup;
+    protected Context mContext;
+    protected int mLayoutId;
+
+    public ComRecyclerViewAdapter(Context context, int layoutId) {
+        mContext = context;
+        mLayoutId = layoutId;
+        mGroup = new ArrayList<>();
+    }
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return ComViewHolder.getComViewHolder(mContext, mLayoutId, parent);
+    }
+
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        convert((ComViewHolder) holder, mGroup.get(position), getItemViewType(position), position);
+    }
+
+    public abstract void convert(ComViewHolder viewHolder, E data, int type, int position);
+
+```
+
+
+当然，一开始的时候说过，除了布局渲染和复用方面有所优化，在动画效果方面也有相关的封装。在讲完动效相关封装后再回来说明。
+
+3.SimpleItemTouchHelperCallback
+RecyclerView最突出的特性之一就在于它提供了比ListView更友好跟方便的动画效果辅助类：ItemTouchHelper及ItemTouchHelper.Callback。基于这个好用而方便的特性当然要加以利用，我们封装了一套SimpleItemTouchHelperCallback，继承ItemTouchHelper.Callback，将常用操作：长按拖动、左右横扫删除等操作及相关的衍生操作（如：置顶）封装进去，并获得手势松开时的回调用来执行后续操作。此外，该类还需要能够在初始化时控制上述两种手势开关。
+
+
+```
+
+public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
+    //一个实现了ItemTouchHelperAdapter接口协议的任意Adapter    
+    private ItemTouchHelperAdapter mAdapter; 
+    
+    //控制两种手势的开关
+    private boolean mCanDrag;
+    private boolean mCanSwipe;
+    
+    //手势松开释放的监听
+    private OnSelectEndListener mOnSelectEndListener;
+
+    public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter, boolean canDrag, boolean canSwipe) {
+        mAdapter = adapter;
+        mCanDrag = canDrag;
+        mCanSwipe = canSwipe;
+    }
+
+    public void setOnSelectEndListener(OnSelectEndListener onSelectEndListener) {
+        mOnSelectEndListener = onSelectEndListener;
+    }
+
+    
+    //默认支持竖直方向上下,水平方向左右动作
+    @Override
+    public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.START | ItemTouchHelper.END);
+    }
+
+    //用于两个item交换位置，若两item属于纵向列表方向，则为上下交换。
+    @Override
+    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        mAdapter.onItemSwap(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        return true;
+    }
+     //两个item交换位置后回调（注意跟手势释放的回调加以区分）
+    @Override
+    public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y);
+    }
+
+
+    //用于扫动某个item,可根据direction自行定制,这里未区分（若列表为纵向，则为横扫）
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+    }
+
+    //控制能否长按拖动
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return mCanDrag;
+    }
+
+    //控制能否扫动
+    @Override
+    public boolean isItemViewSwipeEnabled() {
+        return mCanSwipe;
+    }
+   
+    
+    //判断手势是否放开对应item的ViewHolder,一般用于拖动情况中
+    @Override
+    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+
+        if (viewHolder == null) {
+            if (mOnSelectEndListener != null) {
+                mOnSelectEndListener.onSelectEnd();
+            }
+        } else {
+            Log.e("ss","start");
+        }
+        super.onSelectedChanged(viewHolder, actionState);
+    }
+
+    public interface OnSelectEndListener {
+        void onSelectEnd();
+    }
+}
+
+```
+
+4.再谈ComRecyclerViewAdapter
+为了能够使用SimpleItemTouchHelper，令ComRecyclerViewAdapter实现接口```ItemTouchHelperAdapter```及相关协议：
+
+```
+public interface ItemTouchHelperAdapter {
+    void onItemTop(int fromPosition);
+
+    void onItemDismiss(int position);
+
+    void onItemSwap(int itemAPosition, int itemBPosition);
+}
+
+```
+
+最终得到可支持通用动效的高度复用的ComRecyclerViewAdapter，这其中无非就是两项，ViewHolder及ItemTouchHelperAdapter协议，是不是非常简单？
+
+```
+
+public abstract class ComRecyclerViewAdapter<E> extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
+
+    protected List<E> mGroup;
+    protected Context mContext;
+    protected int mLayoutId;
+
+    public ComRecyclerViewAdapter(Context context, int layoutId) {
+        mContext = context;
+        mLayoutId = layoutId;
+        mGroup = new ArrayList<>();
+    }
+
+    public ComRecyclerViewAdapter(Context context, int layoutId, List<E> datas) {
+        this(context, layoutId);
+        if (datas == null)
+            mGroup = new ArrayList<>();
+        else
+            mGroup = datas;
+    }
+
+    public void setGroup(List<E> group) {
+        mGroup = group;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * 置顶
+     * @param fromPosition
+     */
+    @Override
+    public void onItemTop(int fromPosition) {
+        E data = mGroup.get(fromPosition);
+        for (int i = fromPosition; i > 0; i--) {
+            mGroup.set(i, mGroup.get(i - 1));
+        }
+        mGroup.set(0, data);
+        notifyItemMoved(fromPosition, 0);
+    }
+
+
+    /**
+     * 拖动交换
+     * @param itemAPosition
+     * @param itemBPosition
+     */
+    @Override
+    public void onItemSwap(int itemAPosition, int itemBPosition) {
+        Collections.swap(mGroup, itemAPosition, itemBPosition);
+        notifyItemMoved(itemAPosition, itemBPosition);
+    }
+
+    /**
+     * 删除
+     * @param position
+     */
+    @Override
+    public void onItemDismiss(int position) {
+        mGroup.remove(position);
+        notifyItemRemoved(position);
+    }
+
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return ComViewHolder.getComViewHolder(mContext, mLayoutId, parent);
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        convert((ComViewHolder) holder, mGroup.get(position), getItemViewType(position), position);
+    }
+
+    public abstract void convert(ComViewHolder viewHolder, E data, int type, int position);
+
+
+    @Override
+    public int getItemCount() {
+        return mGroup.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItemIdFromData(mGroup.get(position));
+    }
+
+    public long getItemIdFromData(E data) {
+        return RecyclerView.NO_ID;
+    }
+
+}
+```
+
+后续还会继续对多类型及涉及到Header和Footer的Adapter如何在现有的控件上封装。
