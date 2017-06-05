@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
@@ -27,9 +28,25 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         innerAdapter = new ComRecyclerViewAdapter<String>(this, R.layout.test_item_content_list) {
 
             @Override
-            public void convert(ComViewHolder holder, String data, int type, int position) {
+            public void convert(final ComViewHolder holder, String data, int type, int position) {
                 TextView titleTv = holder.getView(R.id.title);
                 titleTv.setText(data);
+                Button delete = holder.getView(R.id.delete);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((ItemTouchHelperAdapter) mRecyclerView.getAdapter()).onItemDismiss(holder.getLayoutPosition());
+
+                    }
+                });
+                Button top = holder.getView(R.id.on_top);
+                top.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((ItemTouchHelperAdapter) mRecyclerView.getAdapter()).onItemTop(holder.getLayoutPosition());
+
+                    }
+                });
             }
         };
 
