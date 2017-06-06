@@ -3,7 +3,8 @@
 
 ![PullToRefreshRecyclerView总体思路](http://upload-images.jianshu.io/upload_images/6070809-477df6ff3fd6e505.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-##NetableView
+NetableView
+-----------
 封装了三个状态view（Loading、Empty、Error）并从外部传入一个innerView（可以是任意View，作为内容显示的view）。可通过```setNetState(int state)```控制状态页面的展示。状态类型如下：
 -  DATA_STATUS_LOADING = -1;
 -  DATA_STATUS_EMPTY = 0;
@@ -11,7 +12,8 @@
 -  DATA_STATUS_ERROR = 2;
 
 
-##NetableRecyclerView
+NetableRecyclerView
+-----------
 组合了RecyclerView及NetStateView，并将RecyclerView传入NetStateView以进行状态统一管控。通过提供的``` notifyNetState(int state) ```可直接更新页面数据状态。```setDefaultRetryClickListener（）```可设置默认Error页面的重试监听器。
 通过以下三方法可以自定义各状态页面，并且调用立刻生效且不会影响当前数据显示状态：
 ```
@@ -25,7 +27,8 @@
         mNetStateView.customizeErrorView(view);
     }
 ```
-##Pullable接口
+Pullable接口
+-----------
 任何放入PullToRefreshLayout作为innerView的控件都需要实现Pullable接口，使得容器能够判断innerView是否能够进行pullDown和pullUp动作。innerView需要借此控制是否能够进行下拉或上拉操作，返回false则无法进行对应的操作。一般情况下，实现Pullable接口作为innerView的视图控件还要处理与PullToRefreshLayout的滑动事件分发，这个后面再说。
 ```
 public interface Pullable {
@@ -33,7 +36,8 @@ public interface Pullable {
     boolean canPullUp();
 }
 ```
-##PullableRecyclerView
+PullableRecyclerView
+-----------
 介绍了Pullable接口，下面介绍主要成员——PullableRecyclerView。类图如下：
 ![PullableRecyclerView继承关系](http://upload-images.jianshu.io/upload_images/6070809-b8ea8fe065347255.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -92,7 +96,8 @@ public interface Pullable {
 
 这就需要保证在MOVE_DOWN事件发生时，ViewGroup不能拦截，而要允许其透传到子View的dispatchTouchEvent中。至于PullToRefreshLayout中如何做到，详见__PullToRefreshLayout__。
 
-##PullToRefreshLayout
+PullToRefreshLayout
+-----------
 最后介绍最最重要的一个ViewGroup——封装了下拉和上拉的操作的PullToRefreshLayout。作为一个容器，可在xml中按顺序加入三个子view（headerView，innerView及footerView）。使用如下，示例中加入了按照上述原理封装好的WebView作为innerView：
 
 ```
@@ -169,7 +174,8 @@ public interface Pullable {
 1.  重写```onTouchEvent（）```处理触摸态下视图更改。
 2.  处理手松开后，视图的更改，借助Timer、Handler、Task实现。（具体实现方式以后再讲）
 
-##PullToRefreshRecyclerView
+PullToRefreshRecyclerView
+-----------
 
 ![PullToRefreshRecyclerView类图](http://upload-images.jianshu.io/upload_images/6070809-28fd7ba3c34dc1b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -212,7 +218,8 @@ PullToRefreshRecyclerView 初始化直接使用的是xml布局渲染的方式，
 
 在使用RecyclerView的过程中，每一个列表Adapter，每一个样式都要重新编写对应的ViewHolder，去重新实现一遍onCreateViewHolder、onBindViewHolder等方法，这样做实在是劳心费神，非常麻烦。况且，当你希望在RecyclerView中加入动画的时候，（如：左右横滑，长按拖动，置顶，删除等）会发现还需要继承实现ItemTouchHelper.Callback（如果你知道要用它的话），再自行处理其中的dataset相关的变更逻辑，那简直是雪上加霜啊。为解决这些痛点，我们要对RecyclerView.ViewHolder、RecyclerView.Adapter进行封装，做到在绝大多数情况下，一次编写，到处复用。
 
-1.通用ViewHolder
+-	通用ViewHolder
+
 如何能做到通用呢？即不再需要定制ViewHolder，甚至不再需要在你的代码中new出任何ViewHolder，在用到ViewHolder中的任何一个控件都不用再每次都使用```convertView.findViewById(id)```，因为即便ViewHolder中的布局很简单，也会有性能损耗（想想findViewById的原理）。但做到这两点优化并不难：ViewHolder的设计初衷就是缓存布局文件的各个控件，方便查找和设置内容。因此我们在遵循该初衷的基础上更进一步，传入**layoutId**，在ViewHolder初始化时渲染好ItemView；设置缓存机制（使用SparseArray，int-Obj 对应的映射表），即在ViewHolder内部就能直接获取到并返回所需要用到的每一个控件，这样就完成了ComViewHolder的封装，代码如下。
 
 
@@ -250,7 +257,9 @@ public class ComViewHolder extends RecyclerView.ViewHolder {
 ```
 
 
-2.ComRecyclerViewAdapter
+-	ComRecyclerViewAdapter
+
+
 通用的Adapter，在使用上述ComViewHolder之后，就避免了手写onCreateViewHolder（）和onBindViewHolder（）方法的处境，取而代之的是暴露一个虚方法convert（）给业务代码，在convert（）方法中进行对应item的控件操作。由于ComViewHolder提供了静态方法```getComViewHolder（context，layoutId，viewGroup）```并返回ComViewHolder实例，因此在Adapter在任何需要初始化ViewHolder场景的情况下，都能直接使用getComViewHolder。相关方法实现如下：
 
 
@@ -283,7 +292,9 @@ public class ComViewHolder extends RecyclerView.ViewHolder {
 
 当然，一开始的时候说过，除了布局渲染和复用方面有所优化，在动画效果方面也有相关的封装。在讲完动效相关封装后再回来说明。
 
-3.SimpleItemTouchHelperCallback
+-	SimpleItemTouchHelperCallback
+
+
 RecyclerView最突出的特性之一就在于它提供了比ListView更友好跟方便的动画效果辅助类：ItemTouchHelper及ItemTouchHelper.Callback。基于这个好用而方便的特性当然要加以利用，我们封装了一套SimpleItemTouchHelperCallback，继承ItemTouchHelper.Callback，将常用操作：长按拖动、左右横扫删除等操作及相关的衍生操作（如：置顶）封装进去，并获得手势松开时的回调用来执行后续操作。此外，该类还需要能够在初始化时控制上述两种手势开关。
 
 
@@ -370,7 +381,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
 ```
 
-4.再谈ComRecyclerViewAdapter
+-	再谈ComRecyclerViewAdapter
+
+
 为了能够使用SimpleItemTouchHelper，令ComRecyclerViewAdapter实现接口```ItemTouchHelperAdapter```及相关协议：
 
 ```
