@@ -207,8 +207,8 @@ PullToRefreshRecyclerView 初始化直接使用的是xml布局渲染的方式，
 
 
 
-##打造高效通用RecyclerView.Adapter及ViewHolder
-
+打造高效通用RecyclerView.Adapter及ViewHolder
+--------------------------------------------
 
 在使用RecyclerView的过程中，每一个列表Adapter，每一个样式都要重新编写对应的ViewHolder，去重新实现一遍onCreateViewHolder、onBindViewHolder等方法，这样做实在是劳心费神，非常麻烦。况且，当你希望在RecyclerView中加入动画的时候，（如：左右横滑，长按拖动，置顶，删除等）会发现还需要继承实现ItemTouchHelper.Callback（如果你知道要用它的话），再自行处理其中的dataset相关的变更逻辑，那简直是雪上加霜啊。为解决这些痛点，我们要对RecyclerView.ViewHolder、RecyclerView.Adapter进行封装，做到在绝大多数情况下，一次编写，到处复用。
 
