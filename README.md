@@ -205,6 +205,8 @@ public interface Pullable {
 
 PullToRefreshRecyclerView 初始化直接使用的是xml布局渲染的方式，定制了一套header和footer布局。merge之后，该类本身即为xml布局文件中三个子view的父布局。因此在PullToRefreshLayout首次onLayout获取子view的时候即可拿到对应内容。
 
+
+
 ##打造高效通用RecyclerView.Adapter及ViewHolder
 
 
