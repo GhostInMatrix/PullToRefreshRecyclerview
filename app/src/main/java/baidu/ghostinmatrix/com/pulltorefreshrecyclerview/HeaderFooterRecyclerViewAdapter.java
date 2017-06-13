@@ -82,7 +82,7 @@ public class HeaderFooterRecyclerViewAdapter extends RecyclerView.Adapter implem
         if (isHeaderPosition(fromPosition) || isFooterPosition(fromPosition)) {
             return;
         }
-        ((ItemTouchHelperAdapter) mInnerAdapter).onItemTop(fromPosition);
+        ((ItemTouchHelperAdapter) mInnerAdapter).onItemTop(fromPosition - mHeaderViews.size());
         notifyItemMoved(fromPosition, mHeaderViews.size());
     }
 
@@ -98,7 +98,7 @@ public class HeaderFooterRecyclerViewAdapter extends RecyclerView.Adapter implem
     public void onItemSwap(int itemAPosition, int itemBPosition) {
         if (isHeaderPosition(itemAPosition) || isFooterPosition(itemBPosition) || isFooterPosition(itemAPosition) || isFooterPosition(itemBPosition))
             return;
-        ((ItemTouchHelperAdapter) mInnerAdapter).onItemSwap(itemAPosition, itemBPosition);
+        ((ItemTouchHelperAdapter) mInnerAdapter).onItemSwap(itemAPosition - mHeaderViews.size(), itemBPosition - mHeaderViews.size());
         notifyItemMoved(itemAPosition, itemBPosition);
     }
 
