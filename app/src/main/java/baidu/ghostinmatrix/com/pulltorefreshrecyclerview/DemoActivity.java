@@ -53,6 +53,8 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         HeaderFooterRecyclerViewAdapter headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapter(this, innerAdapter);
         View headerView = View.inflate(this, R.layout.test_header, null);
         headerFooterRecyclerViewAdapter.addHeaderView(headerView);
+        View footerView = View.inflate(this, R.layout.test_footer, null);
+        headerFooterRecyclerViewAdapter.addFooterView(footerView);
         mRecyclerView.setAdapter(headerFooterRecyclerViewAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) mRecyclerView.getAdapter(), true, true);
