@@ -496,7 +496,8 @@ public abstract class ComRecyclerViewAdapter<E> extends RecyclerView.Adapter imp
 后续还会继续对多类型及涉及到Header和Footer的Adapter如何在现有的控件上封装。
 
 
-###FullEmptyStateRecyclerViewAdapter
+FullEmptyStateRecyclerViewAdapter
+---------
 
 新增Adapter，可结合目前上述各类Adapter，以包装形式进行组合，从而达到各类列表展示形式。
 另：空页面的展示可选择使用该Adapter进行自动展示，替代原有的通过notifyNetStateView(LOADING)展示空页面的手动方式。
