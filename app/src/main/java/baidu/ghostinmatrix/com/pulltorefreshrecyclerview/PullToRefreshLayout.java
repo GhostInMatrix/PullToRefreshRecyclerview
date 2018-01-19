@@ -15,6 +15,8 @@ import android.widget.RelativeLayout;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.Pullable;
+
 public class PullToRefreshLayout extends RelativeLayout {
     protected Context mContext;
     public static final int INIT = 0;
@@ -27,6 +29,7 @@ public class PullToRefreshLayout extends RelativeLayout {
     private OnRefreshListener mListener;
     public static final int SUCCEED = 0;
     public static final int FAIL = 1;
+    public static final int EMPTY = 2;
     private float downY, lastY;
     private float downX, lastX;
 
@@ -62,8 +65,8 @@ public class PullToRefreshLayout extends RelativeLayout {
         public void handleMessage(Message msg) {
             Log.e("timer", "running");
             if (!canceled) {
-                MOVE_SPEED = (float) (8 + 5 * Math.tan(Math.PI / 2
-                        / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
+                MOVE_SPEED = (float) (8 + 5 * Math.tan(
+                        Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
                 if (!isTouch) {
                     if (state == REFRESHING && pullDownY <= refreshDist) {
                         pullDownY = refreshDist;

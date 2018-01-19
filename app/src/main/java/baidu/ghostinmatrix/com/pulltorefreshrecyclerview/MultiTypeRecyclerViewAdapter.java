@@ -9,11 +9,11 @@ import java.util.List;
 /**
  * Created by shanjie on 2017/5/12.
  */
-public abstract class MultiTypeRecyclerViewAdapter<E> extends ComRecyclerViewAdapter {
+public abstract class MultiTypeRecyclerViewAdapter<E> extends ComRecyclerViewAdapter<E> {
 
-    private MultiTypeSupport mMultiTypeSupport;
+    private MultiTypeSupport<E> mMultiTypeSupport;
 
-    public MultiTypeRecyclerViewAdapter(Context context, MultiTypeSupport multiTypeSupport) {
+    public MultiTypeRecyclerViewAdapter(Context context, MultiTypeSupport<E> multiTypeSupport) {
         super(context, -1);
         mMultiTypeSupport = multiTypeSupport;
     }
@@ -34,7 +34,7 @@ public abstract class MultiTypeRecyclerViewAdapter<E> extends ComRecyclerViewAda
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        super.onBindViewHolder(holder,position);
+        super.onBindViewHolder(holder, position);
     }
 
     @Override

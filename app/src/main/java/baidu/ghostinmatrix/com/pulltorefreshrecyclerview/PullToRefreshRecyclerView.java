@@ -10,12 +10,16 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
 
+
 /**
  * Created by shanjie on 2017/4/20.
  */
 public class PullToRefreshRecyclerView extends PullToRefreshLayout {
 
     protected Context mContext;
+
+    private boolean allowRefreshDefault;
+    private boolean allowLoadMoreDefault;
 
     public PullToRefreshRecyclerView(Context context) {
         super(context);
@@ -37,10 +41,28 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
 
     public void setAllowRefresh(boolean allowRefresh) {
         ((PullableRecyclerView) pullableView).setAllowRefresh(allowRefresh);
+        allowRefreshDefault = allowRefresh;
     }
 
     public void setAllowLoad(boolean allowLoad) {
         ((PullableRecyclerView) pullableView).setAllowLoad(allowLoad);
+        allowLoadMoreDefault = allowLoad;
+    }
+
+    @Override
+    public void refreshFinish(int refreshResult) {
+        super.refreshFinish(refreshResult);
+        switch (refreshResult){
+            case EMPTY:
+            case FAIL:
+                setAllowLoad(false);
+                setAllowRefresh(false);
+                break;
+            case SUCCEED:
+                setAllowLoad(allowLoadMoreDefault);
+                setAllowRefresh(allowRefreshDefault);
+                break;
+        }
     }
 
     private void init() {
@@ -57,6 +79,9 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
         refreshingAnimation.setInterpolator(new LinearInterpolator());
         setHeaderAnimation(refreshingAnimation, loadingHeader);
         setFooterAnimation(refreshingAnimation, loadingFooter);
+
+        allowRefreshDefault = ((PullableRecyclerView) pullableView).isAllowRefresh();
+        allowLoadMoreDefault = ((PullableRecyclerView) pullableView).isAllowLoad();
     }
 
 
@@ -84,6 +109,7 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
     public void customizeErrorView(View view) {
         ((PullableRecyclerView) pullableView).customizeErrorView(view);
     }
+
 
 
 }

@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
 
@@ -68,9 +67,10 @@ public class NetableRecyclerView extends RelativeLayout {
     }
 
     private void init() {
+
         View view = inflate(mContext, R.layout.widget_recycler_netable_view, this);
-        mNetStateView = (NetStateView) view.findViewById(R.id.net_state_view);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mNetStateView = view.findViewById(R.id.net_state_view);
+        mRecyclerView = view.findViewById(R.id.recycler_view);
         mNetStateView.setInnerView(mRecyclerView);
     }
 
@@ -91,13 +91,7 @@ public class NetableRecyclerView extends RelativeLayout {
     }
 
     public void setDefaultRetryClickListener(OnClickListener onClickListener) {
-        View errorView = mNetStateView.getmErrorView();
-        if (errorView != null) {
-            Button btn = (Button) errorView.findViewById(R.id.error_retry_btn);
-            if (btn != null) {
-                btn.setOnClickListener(onClickListener);
-            }
-        }
+        mNetStateView.setDefaultRetryClickListener(onClickListener);
     }
 
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -24,11 +25,18 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity_content_list);
-        mRecyclerView = (PullToRefreshRecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = findViewById(R.id.recycler_view);
         innerAdapter = new ComRecyclerViewAdapter<String>(this, R.layout.test_item_content_list) {
 
             @Override
             public void convert(final ComViewHolder holder, String data, int type, int position) {
+                LinearLayout llCard = holder.getView(R.id.ll_card);
+                llCard.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HeaderFullEmptyStateActivity.start(DemoActivity.this);
+                    }
+                });
                 TextView titleTv = holder.getView(R.id.title);
                 titleTv.setText(data);
                 Button delete = holder.getView(R.id.delete);
@@ -36,7 +44,6 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
                     @Override
                     public void onClick(View v) {
                         ((ItemTouchHelperAdapter) mRecyclerView.getAdapter()).onItemDismiss(holder.getLayoutPosition());
-
                     }
                 });
                 Button top = holder.getView(R.id.on_top);
@@ -57,6 +64,9 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         headerFooterRecyclerViewAdapter.addFooterView(footerView);
         mRecyclerView.setAdapter(headerFooterRecyclerViewAdapter);
 
+        /**
+         * 如果需要用手势，则需要下面代码
+         */
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) mRecyclerView.getAdapter(), true, true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView.getPullableRecyclerView().getRecyclerView());

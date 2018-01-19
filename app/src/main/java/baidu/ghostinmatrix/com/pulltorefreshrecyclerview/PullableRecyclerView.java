@@ -36,6 +36,13 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
         mAllowLoad = allowLoad;
     }
 
+    public boolean isAllowRefresh() {
+        return mAllowRefresh;
+    }
+
+    public boolean isAllowLoad() {
+        return mAllowLoad;
+    }
 
     @Override
     public boolean canPullDown() {
@@ -64,17 +71,32 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
                 mCanLoad = false;
                 break;
             case NetStateView.DATA_STATUS_NORMAL:
-                if ((((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition()) == 0) {
+
+                LinearLayoutManager manager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+
+                if (!mRecyclerView.canScrollVertically(-1)) {
                     mCanRefresh = true;
                 } else {
                     mCanRefresh = false;
                 }
 
-                if ((((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition()) == getAdapter().getItemCount() - 1) {
+//                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
+//                    mCanRefresh = true;
+//                } else {
+//                    mCanRefresh = false;
+//                }
+                if (!mRecyclerView.canScrollVertically(1)) {
                     mCanLoad = true;
                 } else {
                     mCanLoad = false;
                 }
+
+//                if (getAdapter() != null
+//                        && manager.findLastCompletelyVisibleItemPosition() == getAdapter().getItemCount() - 1) {
+//                    mCanLoad = true;
+//                } else {
+//                    mCanLoad = false;
+//                }
                 break;
         }
 

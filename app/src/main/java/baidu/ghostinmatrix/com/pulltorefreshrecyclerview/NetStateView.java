@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
+
 
 /**
  * Created by shanjie on 2017/3/29.
@@ -14,6 +16,8 @@ public class NetStateView extends RelativeLayout {
     private View mEmptyView;
     private View mErrorView;
     private View mInnerView;
+    private LayoutParams mCommonViewLp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+
     private Context mContext;
     public final static int DATA_STATUS_LOADING = -1;
     public final static int DATA_STATUS_EMPTY = 0;
@@ -44,19 +48,18 @@ public class NetStateView extends RelativeLayout {
     private void init() {
         setGravity(Gravity.CENTER);
         mEmptyView = inflate(mContext, R.layout.common_empty, null);
-        RelativeLayout.LayoutParams emptyViewLp = new LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        mEmptyView.setLayoutParams(emptyViewLp);
+        mEmptyView.setLayoutParams(mCommonViewLp);
 
-        mLoadingView = inflate(mContext, R.layout.common_loading, null);
+        mLoadingView = inflate(mContext, R.layout.pop_loading, null);
         mErrorView = inflate(mContext, R.layout.common_error, null);
-        mErrorView.setLayoutParams(emptyViewLp);
-        mLoadingView.setLayoutParams(emptyViewLp);
+        mErrorView.setLayoutParams(mCommonViewLp);
+        mLoadingView.setLayoutParams(mCommonViewLp);
         addView(mEmptyView);
         addView(mLoadingView);
         addView(mErrorView);
-        Util.hideView(mEmptyView);
-        Util.hideView(mLoadingView);
-        Util.hideView(mErrorView);
+        mEmptyView.setVisibility(GONE);
+        mLoadingView.setVisibility(GONE);
+        mErrorView.setVisibility(GONE);
     }
 
     public void setInnerView(View innerView) {
@@ -66,6 +69,7 @@ public class NetStateView extends RelativeLayout {
     public void customizeEmptyView(View view) {
         removeView(mEmptyView);
         mEmptyView = view;
+        mEmptyView.setLayoutParams(mCommonViewLp);
         addView(mEmptyView);
         requestLayout();
         setNetState(curState);
@@ -74,6 +78,7 @@ public class NetStateView extends RelativeLayout {
     public void customizeLoadingView(View view) {
         removeView(mLoadingView);
         mLoadingView = view;
+        mLoadingView.setLayoutParams(mCommonViewLp);
         addView(mLoadingView);
         requestLayout();
         setNetState(curState);
@@ -82,6 +87,7 @@ public class NetStateView extends RelativeLayout {
     public void customizeErrorView(View view) {
         removeView(mErrorView);
         mErrorView = view;
+        mErrorView.setLayoutParams(mCommonViewLp);
         addView(mErrorView);
         requestLayout();
         setNetState(curState);
@@ -96,42 +102,40 @@ public class NetStateView extends RelativeLayout {
         curState = status;
         switch (status) {
             case DATA_STATUS_NORMAL:
-                Util.showView(mInnerView);
-                Util.hideView(mEmptyView);
-                Util.hideView(mErrorView);
-                Util.hideView(mLoadingView);
-
+                mInnerView.setVisibility(VISIBLE);
+                mEmptyView.setVisibility(GONE);
+                mErrorView.setVisibility(GONE);
+                mLoadingView.setVisibility(GONE);
                 break;
             case DATA_STATUS_EMPTY:
-                Util.showView(mEmptyView);
-                Util.hideView(mInnerView);
-                Util.hideView(mErrorView);
-                Util.hideView(mLoadingView);
-
+                mEmptyView.setVisibility(VISIBLE);
+                mInnerView.setVisibility(GONE);
+                mErrorView.setVisibility(GONE);
+                mLoadingView.setVisibility(GONE);
                 break;
             case DATA_STATUS_ERROR:
-                Util.showView(mErrorView);
-                Util.hideView(mEmptyView);
-                Util.hideView(mInnerView);
-                Util.hideView(mLoadingView);
+                mErrorView.setVisibility(VISIBLE);
+                mInnerView.setVisibility(GONE);
+                mEmptyView.setVisibility(GONE);
+                mLoadingView.setVisibility(GONE);
 
                 break;
             case DATA_STATUS_LOADING:
-                Util.showView(mLoadingView);
+                mLoadingView.setVisibility(VISIBLE);
                 if (isTransparentMode) {
                     mLoadingView.bringToFront();
                 } else {
-                    Util.hideView(mEmptyView);
-                    Util.hideView(mInnerView);
-                    Util.hideView(mErrorView);
+                    mEmptyView.setVisibility(GONE);
+                    mInnerView.setVisibility(GONE);
+                    mErrorView.setVisibility(GONE);
                 }
                 break;
 
             default:
-                Util.hideView(mErrorView);
-                Util.hideView(mEmptyView);
-                Util.hideView(mInnerView);
-                Util.hideView(mLoadingView);
+                mEmptyView.setVisibility(GONE);
+                mInnerView.setVisibility(GONE);
+                mErrorView.setVisibility(GONE);
+                mLoadingView.setVisibility(GONE);
                 break;
         }
     }
@@ -160,5 +164,8 @@ public class NetStateView extends RelativeLayout {
         isTransparentMode = transparentMode;
     }
 
-
+    public void setDefaultRetryClickListener(OnClickListener onClickListener) {
+        Button btn = (Button) mErrorView.findViewById(R.id.error_retry_btn);
+        btn.setOnClickListener(onClickListener);
+    }
 }
