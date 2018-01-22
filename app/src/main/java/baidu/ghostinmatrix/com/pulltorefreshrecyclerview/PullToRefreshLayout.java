@@ -14,8 +14,13 @@ import android.widget.RelativeLayout;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.Pullable;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class PullToRefreshLayout extends RelativeLayout {
     protected Context mContext;
@@ -39,7 +44,7 @@ public class PullToRefreshLayout extends RelativeLayout {
     private float refreshDist = 200;
     private float loadmoreDist = 200;
 
-    private MyTimer timer;
+    private MyTimer myTimer;
     public float MOVE_SPEED = 8;
     private boolean isLayout = false;
     private boolean isTouch = false;
@@ -63,20 +68,20 @@ public class PullToRefreshLayout extends RelativeLayout {
 
         @Override
         public void handleMessage(Message msg) {
-            Log.e("timer", "running");
+            Log.e("myTimer", "running");
             if (!canceled) {
                 MOVE_SPEED = (float) (8 + 5 * Math.tan(
                         Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
                 if (!isTouch) {
                     if (state == REFRESHING && pullDownY <= refreshDist) {
                         pullDownY = refreshDist;
-                        timer.cancel();
-                        Log.e("timer", "state == REFRESHING && pullDownY <= refreshDist");
+                        myTimer.cancel();
+                        Log.e("myTimer", "state == REFRESHING && pullDownY <= refreshDist");
                         canceled = true;
                     } else if (state == LOADING && -pullUpY <= loadmoreDist) {
                         pullUpY = -loadmoreDist;
-                        timer.cancel();
-                        Log.e("timer", "state == LOADING && -pullUpY <= loadmoreDist");
+                        myTimer.cancel();
+                        Log.e("myTimer", "state == LOADING && -pullUpY <= loadmoreDist");
 
                         canceled = true;
                     }
@@ -92,8 +97,8 @@ public class PullToRefreshLayout extends RelativeLayout {
                     if (state != REFRESHING && state != LOADING) {
                         changeState(INIT);
                     }
-                    timer.cancel();
-                    Log.e("timer", "state != REFRESHING && state != LOADING");
+                    myTimer.cancel();
+                    Log.e("myTimer", "state != REFRESHING && state != LOADING");
 
                 }
                 if (pullUpY > 0) {
@@ -101,21 +106,21 @@ public class PullToRefreshLayout extends RelativeLayout {
                     if (state != REFRESHING && state != LOADING) {
                         changeState(INIT);
                     }
-                    timer.cancel();
-                    Log.e("timer", "state != REFRESHING && state != LOADING");
+                    myTimer.cancel();
+                    Log.e("myTimer", "state != REFRESHING && state != LOADING");
                 }
 
                 if ((pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)) {
                     changeState(INIT);
-                    timer.cancel();
-                    Log.e("timer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
+                    myTimer.cancel();
+                    Log.e("myTimer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
                 }
 
                 if (state == DONE) {
                     if (pullDownY == 0 && pullUpY == 0) {
                         changeState(INIT);
-                        timer.cancel();
-                        Log.e("timer", "pullDownY == 0 && pullUpY == 0");
+                        myTimer.cancel();
+                        Log.e("myTimer", "pullDownY == 0 && pullUpY == 0");
                     }
                 }
                 requestLayout();
@@ -126,7 +131,7 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void hide() {
         canceled = false;
-        timer.schedule(5);
+        myTimer.schedule(5);
     }
 
 
@@ -150,7 +155,7 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void initView(Context context) {
-        timer = new MyTimer(updateHandler);
+        myTimer = new MyTimer(updateHandler);
         mContext = context;
     }
 
@@ -210,13 +215,35 @@ public class PullToRefreshLayout extends RelativeLayout {
             default:
                 break;
         }
-        new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                changeState(DONE);
-                hide();
-            }
-        }.sendEmptyMessageDelayed(0, 1000);
+        Observable.timer(1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Long>() {
+                    Disposable disposable;
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        changeState(DONE);
+                        hide();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (disposable != null)
+                            disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (disposable != null)
+                            disposable.dispose();
+                    }
+                });
     }
 
     public void loadmoreFinish(int refreshResult) {
@@ -230,13 +257,36 @@ public class PullToRefreshLayout extends RelativeLayout {
             default:
                 break;
         }
-        new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                changeState(DONE);
-                hide();
-            }
-        }.sendEmptyMessageDelayed(0, 1000);
+
+        Observable.timer(1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Long>() {
+                    Disposable disposable;
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        changeState(DONE);
+                        hide();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (disposable != null)
+                            disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (disposable != null)
+                            disposable.dispose();
+                    }
+                });
     }
 
     private void changeState(int to) {
@@ -271,6 +321,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         canPullDown = true;
         canPullUp = true;
     }
+
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -316,8 +367,8 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_DOWN:
                 downY = ev.getY();
                 lastY = downY;
-                timer.cancel();
-                Log.e("timer", "init");
+                myTimer.cancel();
+                Log.e("myTimer", "init");
 
                 mEvents = 0;
                 releasePull();
