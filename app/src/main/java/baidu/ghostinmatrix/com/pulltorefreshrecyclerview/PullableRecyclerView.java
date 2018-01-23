@@ -55,6 +55,8 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
         return mAllowLoad && mCanLoad;
     }
 
+
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (mNetStateView.getNetState()) {

@@ -25,6 +25,8 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity_content_list);
+        Button btnRefresh = findViewById(R.id.btn_refresh);
+
         mRecyclerView = findViewById(R.id.recycler_view);
         innerAdapter = new ComRecyclerViewAdapter<String>(this, R.layout.test_item_content_list) {
 
@@ -72,6 +74,13 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         itemTouchHelper.attachToRecyclerView(mRecyclerView.getPullableRecyclerView().getRecyclerView());
         mRecyclerView.setOnRefreshListener(this);
         mPresenter = new DemoPresenter(this);
+
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRecyclerView.autoRefresh();
+            }
+        });
     }
 
     @Override

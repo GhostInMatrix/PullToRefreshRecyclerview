@@ -10,7 +10,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
 
-
 /**
  * Created by shanjie on 2017/4/20.
  */
@@ -52,7 +51,7 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
     @Override
     public void refreshFinish(int refreshResult) {
         super.refreshFinish(refreshResult);
-        switch (refreshResult){
+        switch (refreshResult) {
             case EMPTY:
             case FAIL:
                 setAllowLoad(false);
@@ -84,6 +83,10 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
         allowLoadMoreDefault = ((PullableRecyclerView) pullableView).isAllowLoad();
     }
 
+    @Override
+    public void scrollToTop() {
+        ((PullableRecyclerView) pullableView).getRecyclerView().smoothScrollToPosition(0);
+    }
 
     public void setAdapter(RecyclerView.Adapter adapter) {
         ((PullableRecyclerView) pullableView).setAdapter(adapter);
@@ -109,7 +112,6 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
     public void customizeErrorView(View view) {
         ((PullableRecyclerView) pullableView).customizeErrorView(view);
     }
-
 
 
 }

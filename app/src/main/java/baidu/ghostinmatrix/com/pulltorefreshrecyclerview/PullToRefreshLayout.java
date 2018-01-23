@@ -2,8 +2,6 @@ package baidu.ghostinmatrix.com.pulltorefreshrecyclerview;
 
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,14 +10,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class PullToRefreshLayout extends RelativeLayout {
@@ -44,11 +42,9 @@ public class PullToRefreshLayout extends RelativeLayout {
     private float refreshDist = 200;
     private float loadmoreDist = 200;
 
-    private MyTimer myTimer;
     public float MOVE_SPEED = 8;
     private boolean isLayout = false;
     private boolean isTouch = false;
-    private boolean canceled = false;
     private float radio = 2;
     private Animation mRefreshingAnimation;
     private Animation mLoadingAnimation;
@@ -60,80 +56,143 @@ public class PullToRefreshLayout extends RelativeLayout {
     protected View mLoadingView;
 
     protected View pullableView;
-    private int mEvents;
     private boolean canPullDown = true;
     private boolean canPullUp = true;
+    private Disposable disposable;
 
-    Handler updateHandler = new Handler() {
 
-        @Override
-        public void handleMessage(Message msg) {
-            Log.e("myTimer", "running");
-            if (!canceled) {
-                MOVE_SPEED = (float) (8 + 5 * Math.tan(
-                        Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
-                if (!isTouch) {
-                    if (state == REFRESHING && pullDownY <= refreshDist) {
-                        pullDownY = refreshDist;
-                        myTimer.cancel();
-                        Log.e("myTimer", "state == REFRESHING && pullDownY <= refreshDist");
-                        canceled = true;
-                    } else if (state == LOADING && -pullUpY <= loadmoreDist) {
-                        pullUpY = -loadmoreDist;
-                        myTimer.cancel();
-                        Log.e("myTimer", "state == LOADING && -pullUpY <= loadmoreDist");
-
-                        canceled = true;
-                    }
-                }
-                if (pullDownY > 0) {
-                    pullDownY -= MOVE_SPEED;
-
-                } else if (pullUpY < 0)
-                    pullUpY += MOVE_SPEED;
-
-                if (pullDownY < 0) {
-                    pullDownY = 0;
-                    if (state != REFRESHING && state != LOADING) {
-                        changeState(INIT);
-                    }
-                    myTimer.cancel();
-                    Log.e("myTimer", "state != REFRESHING && state != LOADING");
-
-                }
-                if (pullUpY > 0) {
-                    pullUpY = 0;
-                    if (state != REFRESHING && state != LOADING) {
-                        changeState(INIT);
-                    }
-                    myTimer.cancel();
-                    Log.e("myTimer", "state != REFRESHING && state != LOADING");
-                }
-
-                if ((pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)) {
-                    changeState(INIT);
-                    myTimer.cancel();
-                    Log.e("myTimer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
-                }
-
-                if (state == DONE) {
-                    if (pullDownY == 0 && pullUpY == 0) {
-                        changeState(INIT);
-                        myTimer.cancel();
-                        Log.e("myTimer", "pullDownY == 0 && pullUpY == 0");
-                    }
-                }
-                requestLayout();
+    private void doHide() {
+        MOVE_SPEED = (float) (8 + 5 * Math.tan(
+                Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
+        if (!isTouch) {
+            if (state == REFRESHING && pullDownY <= refreshDist) {
+                pullDownY = refreshDist;
+                disposable.dispose();
+                Log.e("myTimer", "state == REFRESHING && pullDownY <= refreshDist");
+            } else if (state == LOADING && -pullUpY <= loadmoreDist) {
+                pullUpY = -loadmoreDist;
+                disposable.dispose();
+                Log.e("myTimer", "state == LOADING && -pullUpY <= loadmoreDist");
             }
         }
+        if (pullDownY > 0) {
+            pullDownY -= MOVE_SPEED;
 
-    };
+        } else if (pullUpY < 0)
+            pullUpY += MOVE_SPEED;
 
-    private void hide() {
-        canceled = false;
-        myTimer.schedule(5);
+        if (pullDownY < 0) {
+            pullDownY = 0;
+            if (state != REFRESHING && state != LOADING) {
+                changeState(INIT);
+                Log.e("disposable", "pullDownY < 0 state != REFRESHING && state != LOADING");
+            }
+            disposable.dispose();
+        }
+        if (pullUpY > 0) {
+            pullUpY = 0;
+            if (state != REFRESHING && state != LOADING) {
+                changeState(INIT);
+                Log.e("disposable", "pullUpY>0 state != REFRESHING && state != LOADING");
+            }
+            disposable.dispose();
+
+        }
+
+        if ((pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)) {
+            changeState(INIT);
+            disposable.dispose();
+            Log.e("myTimer", "(pullDownY == 0 && state == REFRESHING) || (pullUpY == 0 && state == LOADING)");
+        }
+
+        if (state == DONE) {
+            if (pullDownY == 0 && pullUpY == 0) {
+                changeState(INIT);
+                disposable.dispose();
+                Log.e("myTimer", "pullDownY == 0 && pullUpY == 0");
+            }
+        }
+        requestLayout();
     }
 
+    private void hide() {
+        if (disposable != null && !disposable.isDisposed())
+            disposable.dispose();
+        disposable = Flowable.interval(5, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        System.out.println("doHide：" + this);
+                        doHide();
+                    }
+                });
+    }
+
+    public void autoRefresh() {
+        scrollToTop();
+        if (canPullDown && state != LOADING) {
+            Observable.interval(5, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Long>() {
+                        Disposable disposable;
+                        float currentY = 0f;
+                        float[] lasty = {0f};
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            disposable = d;
+                        }
+
+                        @Override
+                        public void onNext(Long aLong) {
+                            currentY += 10;
+                            doShowRefreshing(disposable, currentY, lasty);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            if (disposable != null)
+                                disposable.dispose();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            if (disposable != null)
+                                disposable.dispose();
+                        }
+                    });
+        }
+
+    }
+
+    private void doShowRefreshing(Disposable disposable, float currentY, float[] lasty) {
+        pullDownY = pullDownY + (currentY - lasty[0]) / radio;
+        if (pullDownY > getMeasuredHeight())
+            pullDownY = getMeasuredHeight();
+        if (state == REFRESHING) {
+            isTouch = true;
+        }
+        lasty[0] = currentY;
+
+        radio = (float) (2 + 2 * Math.tan(Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
+        requestLayout();
+
+        if (pullDownY >= refreshDist && state == INIT) {
+            disposable.dispose();
+            changeState(RELEASE_TO_REFRESH);
+
+            changeState(REFRESHING);
+            if (mListener != null)
+                mListener.onRefresh(this);
+            Log.e("460", "hide");
+
+            hide();
+        }
+
+    }
 
     public void setOnRefreshListener(OnRefreshListener listener) {
         mListener = listener;
@@ -155,7 +214,6 @@ public class PullToRefreshLayout extends RelativeLayout {
     }
 
     private void initView(Context context) {
-        myTimer = new MyTimer(updateHandler);
         mContext = context;
     }
 
@@ -229,6 +287,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                     @Override
                     public void onNext(Long aLong) {
                         changeState(DONE);
+                        Log.e("247", "hide");
                         hide();
                     }
 
@@ -272,6 +331,8 @@ public class PullToRefreshLayout extends RelativeLayout {
                     @Override
                     public void onNext(Long aLong) {
                         changeState(DONE);
+                        Log.e("291", "hide");
+
                         hide();
                     }
 
@@ -367,44 +428,37 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_DOWN:
                 downY = ev.getY();
                 lastY = downY;
-                myTimer.cancel();
-                Log.e("myTimer", "init");
-
-                mEvents = 0;
                 releasePull();
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (mEvents == 0) {
-                    if (((Pullable) pullableView).canPullDown() && canPullDown
-                            && state != LOADING) {
-                        pullDownY = pullDownY + (ev.getY() - lastY) / radio;
-                        if (pullDownY < 0) {
-                            pullDownY = 0;
-                            canPullDown = false;
-                            canPullUp = true;
-                        }
-                        if (pullDownY > getMeasuredHeight())
-                            pullDownY = getMeasuredHeight();
-                        if (state == REFRESHING) {
-                            isTouch = true;
-                        }
-                    } else if (((Pullable) pullableView).canPullUp() && canPullUp
-                            && state != REFRESHING) {
-                        pullUpY = pullUpY + (ev.getY() - lastY) / radio;
-                        if (pullUpY > 0) {
-                            pullUpY = 0;
-                            canPullDown = true;
-                            canPullUp = false;
-                        }
-                        if (pullUpY < -getMeasuredHeight())
-                            pullUpY = -getMeasuredHeight();
-                        if (state == LOADING) {
-                            isTouch = true;
-                        }
-                    } else
-                        releasePull();
+                if (((Pullable) pullableView).canPullDown() && canPullDown
+                        && state != LOADING) {
+                    pullDownY = pullDownY + (ev.getY() - lastY) / radio;
+                    if (pullDownY < 0) {
+                        pullDownY = 0;
+                        canPullDown = false;
+                        canPullUp = true;
+                    }
+                    if (pullDownY > getMeasuredHeight())
+                        pullDownY = getMeasuredHeight();
+                    if (state == REFRESHING) {
+                        isTouch = true;
+                    }
+                } else if (((Pullable) pullableView).canPullUp() && canPullUp
+                        && state != REFRESHING) {
+                    pullUpY = pullUpY + (ev.getY() - lastY) / radio;
+                    if (pullUpY > 0) {
+                        pullUpY = 0;
+                        canPullDown = true;
+                        canPullUp = false;
+                    }
+                    if (pullUpY < -getMeasuredHeight())
+                        pullUpY = -getMeasuredHeight();
+                    if (state == LOADING) {
+                        isTouch = true;
+                    }
                 } else
-                    mEvents = 0;
+                    releasePull();
                 lastY = ev.getY();
                 radio = (float) (2 + 2 * Math.tan(Math.PI / 2 / getMeasuredHeight() * (pullDownY + Math.abs(pullUpY))));
                 requestLayout();
@@ -427,19 +481,26 @@ public class PullToRefreshLayout extends RelativeLayout {
             case MotionEvent.ACTION_UP:
                 if (pullDownY > refreshDist || -pullUpY > loadmoreDist) {
                     isTouch = false;
+                    Log.e("448", "hide");
+
                     hide();
                 } else if (pullDownY > 0 || -pullUpY > 0) {
+                    Log.e("452", "hide");
                     hide();
                 }
                 if (state == RELEASE_TO_REFRESH) {
                     changeState(REFRESHING);
                     if (mListener != null)
                         mListener.onRefresh(this);
+                    Log.e("460", "hide");
+
                     hide();
                 } else if (state == RELEASE_TO_LOAD) {
                     changeState(LOADING);
                     if (mListener != null)
                         mListener.onLoadMore(this);
+                    Log.e("467", "hide");
+
                     hide();
                 }
             default:
@@ -448,53 +509,14 @@ public class PullToRefreshLayout extends RelativeLayout {
         return true;
     }
 
-    class MyTimer {
-        private Handler handler;
-        private Timer timer;
-        private MyTask mTask;
-
-        public MyTimer(Handler handler) {
-            this.handler = handler;
-            timer = new Timer();
-        }
-
-        public void schedule(long period) {
-            if (mTask != null) {
-                mTask.cancel();
-                mTask = null;
-            }
-            mTask = new MyTask(handler);
-            timer.schedule(mTask, 0, period);
-
-        }
-
-        public void cancel() {
-            if (mTask != null) {
-                mTask.cancel();
-                mTask = null;
-            }
-        }
-
-        class MyTask extends TimerTask {
-            private Handler handler;
-
-            public MyTask(Handler handler) {
-                this.handler = handler;
-            }
-
-            @Override
-            public void run() {
-                handler.obtainMessage().sendToTarget();
-            }
-
-        }
-    }
-
-
     public interface OnRefreshListener {
         void onRefresh(PullToRefreshLayout pullToRefreshLayout);
 
         void onLoadMore(PullToRefreshLayout pullToRefreshLayout);
+    }
+
+    public void scrollToTop() {
+
     }
 
     public class ClassNotPullableException extends Exception {
