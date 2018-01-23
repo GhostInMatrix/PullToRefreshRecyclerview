@@ -72,31 +72,17 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
                 break;
             case NetStateView.DATA_STATUS_NORMAL:
 
-                LinearLayoutManager manager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-
                 if (!mRecyclerView.canScrollVertically(-1)) {
                     mCanRefresh = true;
                 } else {
                     mCanRefresh = false;
                 }
 
-//                if (manager.findFirstCompletelyVisibleItemPosition() == 0) {
-//                    mCanRefresh = true;
-//                } else {
-//                    mCanRefresh = false;
-//                }
                 if (!mRecyclerView.canScrollVertically(1)) {
                     mCanLoad = true;
                 } else {
                     mCanLoad = false;
                 }
-
-//                if (getAdapter() != null
-//                        && manager.findLastCompletelyVisibleItemPosition() == getAdapter().getItemCount() - 1) {
-//                    mCanLoad = true;
-//                } else {
-//                    mCanLoad = false;
-//                }
                 break;
         }
 

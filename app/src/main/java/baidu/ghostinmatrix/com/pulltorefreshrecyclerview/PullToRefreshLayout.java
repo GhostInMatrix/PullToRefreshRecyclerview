@@ -373,10 +373,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                 mEvents = 0;
                 releasePull();
                 break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-            case MotionEvent.ACTION_POINTER_UP:
-                mEvents = -1;
-                break;
             case MotionEvent.ACTION_MOVE:
                 if (mEvents == 0) {
                     if (((Pullable) pullableView).canPullDown() && canPullDown
