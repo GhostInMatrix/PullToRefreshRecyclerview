@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class DemoPresenter implements DemoContract.PresenterContract {
     private DemoContract.ViewContract mViewContract;
-    final List<String> titles = new ArrayList<>();
+    final ArrayList<String> titles = new ArrayList<>();
 
     DemoPresenter(DemoContract.ViewContract viewContract) {
         mViewContract = viewContract;

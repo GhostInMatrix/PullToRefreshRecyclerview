@@ -1,5 +1,6 @@
 package baidu.ghostinmatrix.com.pulltorefreshrecyclerview;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ public interface DemoContract {
     }
 
     interface ViewContract {
-        void onDataRefresh(List<String> data, int netState);
-        void onDataLoad(List<String> data, int netState);
+        void onDataRefresh(ArrayList<String> data, int netState);
+        void onDataLoad(ArrayList<String> data, int netState);
     }
 }

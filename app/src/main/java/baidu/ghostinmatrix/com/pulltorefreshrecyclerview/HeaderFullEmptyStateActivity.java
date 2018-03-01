@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.sfexpress.commonui.widget.recyclerview.ComRecyclerViewAdapterKt;
+import com.sfexpress.commonui.widget.recyclerview.ComViewHolderKt;
+import com.sfexpress.commonui.widget.recyclerview.FullEmptyStateRecyclerViewAdapterKt;
+import com.sfexpress.commonui.widget.recyclerview.HeaderFooterRecyclerViewAdapterKt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +23,9 @@ import java.util.List;
 
 public class HeaderFullEmptyStateActivity extends Activity implements PullToRefreshRecyclerView.OnRefreshListener {
     PullToRefreshRecyclerView recyclerview;
-    ComRecyclerViewAdapter originAdapetr;
-    FullEmptyStateRecyclerViewAdapter fullemptyStateAdapter;
-    HeaderFooterRecyclerViewAdapter headerFooterRecyclerViewAdapter;
+    ComRecyclerViewAdapterKt originAdapetr;
+    FullEmptyStateRecyclerViewAdapterKt fullemptyStateAdapter;
+    HeaderFooterRecyclerViewAdapterKt headerFooterRecyclerViewAdapter;
 
     public static void start(Activity activity) {
         Intent intent = new Intent(activity, HeaderFullEmptyStateActivity.class);
@@ -32,10 +37,10 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_headerfullemptystate);
         recyclerview = findViewById(R.id.recycler_view);
-        originAdapetr = new ComRecyclerViewAdapter<String>(HeaderFullEmptyStateActivity.this, R.layout.test_item_content_list) {
+        originAdapetr = new ComRecyclerViewAdapterKt<String>(HeaderFullEmptyStateActivity.this, R.layout.test_item_content_list) {
 
             @Override
-            public void convert(final ComViewHolder holder, String data, int type, int position) {
+            public void convert(final ComViewHolderKt holder, String data, int type, int position) {
                 TextView titleTv = holder.getView(R.id.title);
                 titleTv.setText(data);
                 Button delete = holder.getView(R.id.delete);
@@ -57,9 +62,9 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
             }
         };
         View emptyView = View.inflate(this, R.layout.common_empty, null);
-        fullemptyStateAdapter = new FullEmptyStateRecyclerViewAdapter(originAdapetr, emptyView);
+        fullemptyStateAdapter = new FullEmptyStateRecyclerViewAdapterKt(originAdapetr, emptyView);
 
-        headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapter(this, fullemptyStateAdapter);
+        headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapterKt( fullemptyStateAdapter);
         View headerView = View.inflate(this, R.layout.header_view, null);
         headerFooterRecyclerViewAdapter.addHeaderView(headerView);
 
@@ -69,7 +74,7 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerview.getPullableRecyclerView().getRecyclerView());
         recyclerview.setOnRefreshListener(this);
-        List<String> titles = new ArrayList<>();
+        ArrayList<String> titles = new ArrayList<>();
         titles.add("title1");
         titles.add("title2");
         titles.add("title3");
@@ -88,7 +93,7 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
 
     @Override
     public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-        List<String> titles = new ArrayList<>();
+        ArrayList<String> titles = new ArrayList<>();
         titles.add("title1");
         titles.add("title2");
         titles.add("title3");

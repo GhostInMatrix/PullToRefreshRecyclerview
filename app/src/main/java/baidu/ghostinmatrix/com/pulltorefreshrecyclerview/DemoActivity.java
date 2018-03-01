@@ -8,6 +8,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.sfexpress.commonui.widget.recyclerview.ComRecyclerViewAdapterKt;
+import com.sfexpress.commonui.widget.recyclerview.ComViewHolderKt;
+import com.sfexpress.commonui.widget.recyclerview.HeaderFooterRecyclerViewAdapterKt;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +24,7 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
 
     PullToRefreshRecyclerView mRecyclerView;
     DemoPresenter mPresenter;
-    ComRecyclerViewAdapter<String> innerAdapter;
+    ComRecyclerViewAdapterKt<String> innerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +33,10 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
         Button btnRefresh = findViewById(R.id.btn_refresh);
 
         mRecyclerView = findViewById(R.id.recycler_view);
-        innerAdapter = new ComRecyclerViewAdapter<String>(this, R.layout.test_item_content_list) {
+        innerAdapter = new ComRecyclerViewAdapterKt<String>(this, R.layout.test_item_content_list) {
 
             @Override
-            public void convert(final ComViewHolder holder, String data, int type, int position) {
+            public void convert(final ComViewHolderKt holder, String data, int type, int position) {
                 LinearLayout llCard = holder.getView(R.id.ll_card);
                 llCard.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -59,7 +64,7 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
             }
         };
 
-        HeaderFooterRecyclerViewAdapter headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapter(this, innerAdapter);
+        HeaderFooterRecyclerViewAdapterKt headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapterKt(innerAdapter);
         View headerView = View.inflate(this, R.layout.test_header, null);
         headerFooterRecyclerViewAdapter.addHeaderView(headerView);
         View footerView = View.inflate(this, R.layout.test_footer, null);
@@ -91,7 +96,7 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
     }
 
     @Override
-    public void onDataRefresh(List<String> data, int netState) {
+    public void onDataRefresh(ArrayList<String> data, int netState) {
         innerAdapter.setGroup(data);
         mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();
@@ -99,7 +104,7 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
     }
 
     @Override
-    public void onDataLoad(List<String> data, int netState) {
+    public void onDataLoad(ArrayList<String> data, int netState) {
         innerAdapter.setGroup(data);
         mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();

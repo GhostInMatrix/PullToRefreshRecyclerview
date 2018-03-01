@@ -1,7 +1,6 @@
 package baidu.ghostinmatrix.com.pulltorefreshrecyclerview;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -54,7 +53,6 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
     public boolean canPullUp() {
         return mAllowLoad && mCanLoad;
     }
-
 
 
     @Override
