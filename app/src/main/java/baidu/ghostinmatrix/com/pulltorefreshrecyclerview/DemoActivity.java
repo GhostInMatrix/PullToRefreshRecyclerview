@@ -1,35 +1,75 @@
 package baidu.ghostinmatrix.com.pulltorefreshrecyclerview;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.sf.lib_android_activity.BaseActivity;
 import com.sfexpress.commonui.widget.recyclerview.ComRecyclerViewAdapterKt;
 import com.sfexpress.commonui.widget.recyclerview.ComViewHolderKt;
 import com.sfexpress.commonui.widget.recyclerview.HeaderFooterRecyclerViewAdapterKt;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by shanjie on 2017/4/24.
  */
 
 
-public class DemoActivity extends Activity implements DemoContract.ViewContract, PullToRefreshRecyclerView.OnRefreshListener {
+public class DemoActivity extends BaseActivity implements DemoContract.ViewContract, PullToRefreshRecyclerView.OnRefreshListener {
 
     PullToRefreshRecyclerView mRecyclerView;
     DemoPresenter mPresenter;
     ComRecyclerViewAdapterKt<String> innerAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_activity_content_list);
+    protected void onResume() {
+        super.onResume();
+        mRecyclerView.getPullableRecyclerView().notifyNetState(NetStateView.DATA_STATUS_LOADING);
+        mPresenter.getData();
+    }
+
+    @Override
+    public void onDataRefresh(ArrayList<String> data, int netState) {
+        innerAdapter.setGroup(data);
+        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
+    }
+
+    @Override
+    public void onDataLoad(ArrayList<String> data, int netState) {
+        innerAdapter.setGroup(data);
+        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
+        mRecyclerView.getAdapter().notifyDataSetChanged();
+        mRecyclerView.loadmoreFinish(PullToRefreshLayout.DONE);
+    }
+
+    @Override
+    public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
+        mPresenter.getData();
+    }
+
+    @Override
+    public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
+        mPresenter.loadData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mRecyclerView.setOnRefreshListener(null);
+        super.onDestroy();
+    }
+
+    @Override
+    public int getContentLayoutId() {
+        return R.layout.test_activity_content_list;
+    }
+
+    @Override
+    public void initView() {
         Button btnRefresh = findViewById(R.id.btn_refresh);
 
         mRecyclerView = findViewById(R.id.recycler_view);
@@ -87,45 +127,5 @@ public class DemoActivity extends Activity implements DemoContract.ViewContract,
             }
         });
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mRecyclerView.getPullableRecyclerView().notifyNetState(NetStateView.DATA_STATUS_LOADING);
-        mPresenter.getData();
-    }
-
-    @Override
-    public void onDataRefresh(ArrayList<String> data, int netState) {
-        innerAdapter.setGroup(data);
-        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
-        mRecyclerView.getAdapter().notifyDataSetChanged();
-        mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
-    }
-
-    @Override
-    public void onDataLoad(ArrayList<String> data, int netState) {
-        innerAdapter.setGroup(data);
-        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
-        mRecyclerView.getAdapter().notifyDataSetChanged();
-        mRecyclerView.loadmoreFinish(PullToRefreshLayout.DONE);
-    }
-
-    @Override
-    public void onRefresh(PullToRefreshLayout pullToRefreshLayout) {
-        mPresenter.getData();
-    }
-
-    @Override
-    public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
-        mPresenter.loadData();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mRecyclerView.setOnRefreshListener(null);
-        super.onDestroy();
-    }
-
 }
 
