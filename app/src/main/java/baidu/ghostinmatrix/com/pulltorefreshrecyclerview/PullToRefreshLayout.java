@@ -170,8 +170,6 @@ public class PullToRefreshLayout extends RelativeLayout {
 
     private void doShowRefreshing(Disposable disposable, float currentY, float[] lasty) {
         pullDownY = pullDownY + (currentY - lasty[0]) / radio;
-        if (pullDownY > getMeasuredHeight())
-            pullDownY = getMeasuredHeight();
         if (state == REFRESHING) {
             isTouch = true;
         }
@@ -439,8 +437,7 @@ public class PullToRefreshLayout extends RelativeLayout {
                         canPullDown = false;
                         canPullUp = true;
                     }
-                    if (pullDownY > getMeasuredHeight())
-                        pullDownY = getMeasuredHeight();
+                    Log.e("pullDownY", "" + getMeasuredHeight());
                     if (state == REFRESHING) {
                         isTouch = true;
                     }
@@ -452,8 +449,6 @@ public class PullToRefreshLayout extends RelativeLayout {
                         canPullDown = true;
                         canPullUp = false;
                     }
-                    if (pullUpY < -getMeasuredHeight())
-                        pullUpY = -getMeasuredHeight();
                     if (state == LOADING) {
                         isTouch = true;
                     }

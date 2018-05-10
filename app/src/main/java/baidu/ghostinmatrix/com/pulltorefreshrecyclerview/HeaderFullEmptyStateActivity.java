@@ -9,13 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.sfexpress.commonui.widget.recyclerview.ComRecyclerViewAdapterKt;
-import com.sfexpress.commonui.widget.recyclerview.ComViewHolderKt;
-import com.sfexpress.commonui.widget.recyclerview.FullEmptyStateRecyclerViewAdapterKt;
-import com.sfexpress.commonui.widget.recyclerview.HeaderFooterRecyclerViewAdapterKt;
-
 import java.util.ArrayList;
-import java.util.List;
+
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.activity.FantasticActivity;
 
 /**
  * Created by ghostinmatrix on 2018/1/19.
@@ -64,11 +60,17 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
         View emptyView = View.inflate(this, R.layout.common_empty, null);
         fullemptyStateAdapter = new FullEmptyStateRecyclerViewAdapterKt(originAdapetr, emptyView);
 
-        headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapterKt( fullemptyStateAdapter);
+        headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapterKt(fullemptyStateAdapter);
         View headerView = View.inflate(this, R.layout.header_view, null);
         headerFooterRecyclerViewAdapter.addHeaderView(headerView);
 
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FantasticActivity.Companion.navigate(HeaderFullEmptyStateActivity.this);
 
+            }
+        });
         recyclerview.setAdapter(headerFooterRecyclerViewAdapter);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) recyclerview.getAdapter(), true, true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);

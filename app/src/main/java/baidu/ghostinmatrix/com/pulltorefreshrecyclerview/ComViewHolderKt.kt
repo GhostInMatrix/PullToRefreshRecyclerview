@@ -1,4 +1,4 @@
-package com.sfexpress.commonui.widget.recyclerview
+package baidu.ghostinmatrix.com.pulltorefreshrecyclerview
 
 import android.content.Context
 import android.support.v4.util.SparseArrayCompat

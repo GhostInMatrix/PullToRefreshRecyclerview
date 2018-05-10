@@ -1,15 +1,16 @@
-package com.sfexpress.commonui.widget.recyclerview
+package baidu.ghostinmatrix.com.pulltorefreshrecyclerview
 
 import android.support.v4.util.SparseArrayCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ItemTouchHelperAdapter
 
 /**
  * Created by ghostinmatrix on 2018/2/28.
  */
-class HeaderFooterRecyclerViewAdapterKt<E>(private val innerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>)
+class HeaderFooterRecyclerViewAdapterKt(private val innerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ItemTouchHelperAdapter {
     private val HEADER_BASE_TYPE = 10000
     private val FOOTER_BASE_TYPE = 20000

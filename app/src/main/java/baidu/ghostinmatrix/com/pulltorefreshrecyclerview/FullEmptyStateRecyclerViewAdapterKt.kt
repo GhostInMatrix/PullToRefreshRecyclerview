@@ -1,9 +1,10 @@
-package com.sfexpress.commonui.widget.recyclerview
+package baidu.ghostinmatrix.com.pulltorefreshrecyclerview
 
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ItemTouchHelperAdapter
 
 /**

@@ -7,9 +7,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sf.lib_android_activity.BaseActivity;
-import com.sfexpress.commonui.widget.recyclerview.ComRecyclerViewAdapterKt;
-import com.sfexpress.commonui.widget.recyclerview.ComViewHolderKt;
-import com.sfexpress.commonui.widget.recyclerview.HeaderFooterRecyclerViewAdapterKt;
 
 import java.util.ArrayList;
 
@@ -65,7 +62,7 @@ public class DemoActivity extends BaseActivity implements DemoContract.ViewContr
 
     @Override
     public int getContentLayoutId() {
-        return R.layout.test_activity_content_list;
+        return R.layout.activity_demo;
     }
 
     @Override

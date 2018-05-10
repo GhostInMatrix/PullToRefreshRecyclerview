@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <baidu.ghostinmatrix.com.pulltorefreshrecyclerview.pulltorefreshlayout.PullToRefreshLayoutKt
+        android:id="@+id/mPulltorefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/recyclerview_header"
+            layout="@layout/refresh_head" />
+
+        <baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullableView
+            android:id="@+id/pullableview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/red">
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="950dp"
+                android:height="950dp"
+                android:layout_gravity="center"
+                android:background="@color/green"
+                android:gravity="center"
+                android:text="pullableview" />
+
+        </baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullableView>
+
+        <include
+            android:id="@+id/recyclerview_footer"
+            layout="@layout/load_more_2" />
+
+    </baidu.ghostinmatrix.com.pulltorefreshrecyclerview.pulltorefreshlayout.PullToRefreshLayoutKt>
+
+</LinearLayout>
