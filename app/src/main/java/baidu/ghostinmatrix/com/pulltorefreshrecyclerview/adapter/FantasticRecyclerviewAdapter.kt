@@ -104,7 +104,7 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
     }
     
     override fun getItemId(position: Int): Long {
-        return getItemIdFromData(mData[position])
+        return getItemIdFromData(mData[position - mHeader.size])
     }
     
     fun getItemIdFromData(data: E): Long {
