@@ -8,7 +8,11 @@ import kotlin.collections.ArrayList
 
 /**
  * Created by ghostinmatrix on 2018/2/28.
+ *
+ * @see baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.FantasticRecyclerviewAdapter
  */
+@Deprecated("Try to use FantasticRecyclerviewAdapter, which is simpler to replace the combination of these adapters",
+        ReplaceWith("FantasticRecyclerviewAdapter"), DeprecationLevel.WARNING)
 abstract class ComRecyclerViewAdapterKt<E>(val context: Context, private val layoutId: Int)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ItemTouchHelperAdapter {
     protected var mGroup: ArrayList<E> = ArrayList()

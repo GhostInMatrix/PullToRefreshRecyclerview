@@ -4,12 +4,15 @@ import android.support.v4.util.SparseArrayCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ItemTouchHelperAdapter
 
 /**
  * Created by ghostinmatrix on 2018/2/28.
+ * @see baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.FantasticRecyclerviewAdapter
+ 
  */
+
+@Deprecated("Try to use FantasticRecyclerviewAdapter, which is simpler to replace the combination of these adapters",
+        ReplaceWith("FantasticRecyclerviewAdapter"), DeprecationLevel.ERROR)
 class HeaderFooterRecyclerViewAdapterKt(private val innerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ItemTouchHelperAdapter {
     private val HEADER_BASE_TYPE = 10000

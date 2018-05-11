@@ -16,7 +16,7 @@ import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.activity.FantasticActiv
 /**
  * Created by ghostinmatrix on 2018/1/19.
  */
-
+@Deprecated
 public class HeaderFullEmptyStateActivity extends Activity implements PullToRefreshRecyclerView.OnRefreshListener {
     PullToRefreshRecyclerView recyclerview;
     ComRecyclerViewAdapterKt originAdapetr;
@@ -61,7 +61,7 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
         fullemptyStateAdapter = new FullEmptyStateRecyclerViewAdapterKt(originAdapetr, emptyView);
 
         headerFooterRecyclerViewAdapter = new HeaderFooterRecyclerViewAdapterKt(fullemptyStateAdapter);
-        View headerView = View.inflate(this, R.layout.header_view, null);
+        View headerView = View.inflate(this, R.layout.header_search_view, null);
         headerFooterRecyclerViewAdapter.addHeaderView(headerView);
 
         headerView.setOnClickListener(new View.OnClickListener() {
@@ -74,7 +74,7 @@ public class HeaderFullEmptyStateActivity extends Activity implements PullToRefr
         recyclerview.setAdapter(headerFooterRecyclerViewAdapter);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) recyclerview.getAdapter(), true, true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerview.getPullableRecyclerView().getRecyclerView());
+        itemTouchHelper.attachToRecyclerView(recyclerview.getPullableRecyclerView());
         recyclerview.setOnRefreshListener(this);
         ArrayList<String> titles = new ArrayList<>();
         titles.add("title1");

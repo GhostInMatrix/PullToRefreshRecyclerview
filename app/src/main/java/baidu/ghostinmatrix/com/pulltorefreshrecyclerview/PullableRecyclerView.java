@@ -1,6 +1,7 @@
 package baidu.ghostinmatrix.com.pulltorefreshrecyclerview;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
@@ -8,7 +9,7 @@ import android.view.MotionEvent;
 /**
  * Created by shanjie on 2017/3/15.
  */
-public class PullableRecyclerView extends NetableRecyclerView implements Pullable {
+public class PullableRecyclerView extends RecyclerView implements Pullable {
     private boolean mCanRefresh = true;
     private boolean mCanLoad = true;
 
@@ -57,34 +58,49 @@ public class PullableRecyclerView extends NetableRecyclerView implements Pullabl
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        switch (mNetStateView.getNetState()) {
-            case NetStateView.DATA_STATUS_EMPTY:
-                mCanRefresh = true;
-                mCanLoad = false;
-                break;
-            case NetStateView.DATA_STATUS_ERROR:
-                mCanRefresh = false;
-                mCanLoad = false;
-                break;
-            case NetStateView.DATA_STATUS_LOADING:
-                mCanRefresh = false;
-                mCanLoad = false;
-                break;
-            case NetStateView.DATA_STATUS_NORMAL:
-
-                if (!mRecyclerView.canScrollVertically(-1)) {
-                    mCanRefresh = true;
-                } else {
-                    mCanRefresh = false;
-                }
-
-                if (!mRecyclerView.canScrollVertically(1)) {
-                    mCanLoad = true;
-                } else {
-                    mCanLoad = false;
-                }
-                break;
+        mCanRefresh = true;
+        mCanLoad = false;
+        if (!canScrollVertically(-1)) {
+            mCanRefresh = true;
+        } else {
+            mCanRefresh = false;
         }
+
+        if (!canScrollVertically(1)) {
+            mCanLoad = true;
+        } else {
+            mCanLoad = false;
+        }
+
+//
+//        switch (mNetStateView.getNetState()) {
+//            case NetStateView.DATA_STATUS_EMPTY:
+//                mCanRefresh = true;
+//                mCanLoad = false;
+//                break;
+//            case NetStateView.DATA_STATUS_ERROR:
+//                mCanRefresh = false;
+//                mCanLoad = false;
+//                break;
+//            case NetStateView.DATA_STATUS_LOADING:
+//                mCanRefresh = false;
+//                mCanLoad = false;
+//                break;
+//            case NetStateView.DATA_STATUS_NORMAL:
+//
+//                if (!mRecyclerView.canScrollVertically(-1)) {
+//                    mCanRefresh = true;
+//                } else {
+//                    mCanRefresh = false;
+//                }
+//
+//                if (!mRecyclerView.canScrollVertically(1)) {
+//                    mCanLoad = true;
+//                } else {
+//                    mCanLoad = false;
+//                }
+//                break;
+//        }
 
 
         return super.dispatchTouchEvent(ev);

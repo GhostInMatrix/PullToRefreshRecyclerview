@@ -24,14 +24,14 @@ public class DemoActivity extends BaseActivity implements DemoContract.ViewContr
     @Override
     protected void onResume() {
         super.onResume();
-        mRecyclerView.getPullableRecyclerView().notifyNetState(NetStateView.DATA_STATUS_LOADING);
+//        mRecyclerView.getPullableRecyclerView().notifyNetState(NetStateView.DATA_STATUS_LOADING);
         mPresenter.getData();
     }
 
     @Override
     public void onDataRefresh(ArrayList<String> data, int netState) {
         innerAdapter.setGroup(data);
-        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
+//        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();
         mRecyclerView.refreshFinish(PullToRefreshLayout.DONE);
     }
@@ -39,7 +39,7 @@ public class DemoActivity extends BaseActivity implements DemoContract.ViewContr
     @Override
     public void onDataLoad(ArrayList<String> data, int netState) {
         innerAdapter.setGroup(data);
-        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
+//        mRecyclerView.getPullableRecyclerView().notifyNetState(netState);
         mRecyclerView.getAdapter().notifyDataSetChanged();
         mRecyclerView.loadmoreFinish(PullToRefreshLayout.DONE);
     }
@@ -113,7 +113,7 @@ public class DemoActivity extends BaseActivity implements DemoContract.ViewContr
          */
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback((ItemTouchHelperAdapter) mRecyclerView.getAdapter(), true, true);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView.getPullableRecyclerView().getRecyclerView());
+//        itemTouchHelper.attachToRecyclerView(mRecyclerView.getPullableRecyclerView().getRecyclerView());
         mRecyclerView.setOnRefreshListener(this);
         mPresenter = new DemoPresenter(this);
 

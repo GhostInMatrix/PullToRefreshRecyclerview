@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
@@ -85,7 +86,7 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
 
     @Override
     public void scrollToTop() {
-        ((PullableRecyclerView) pullableView).getRecyclerView().smoothScrollToPosition(0);
+        ((PullableRecyclerView) pullableView).smoothScrollToPosition(0);
     }
 
     public void setAdapter(RecyclerView.Adapter adapter) {
@@ -101,17 +102,17 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
         return (PullableRecyclerView) pullableView;
     }
 
-    public void customizeEmptyView(View view) {
-        ((PullableRecyclerView) pullableView).customizeEmptyView(view);
-    }
-
-    public void customizeLoadingView(View view) {
-        ((PullableRecyclerView) pullableView).customizeLoadingView(view);
-    }
-
-    public void customizeErrorView(View view) {
-        ((PullableRecyclerView) pullableView).customizeErrorView(view);
-    }
+//    public void customizeEmptyView(View view) {
+//        ((PullableRecyclerView) pullableView).customizeEmptyView(view);
+//    }
+//
+//    public void customizeLoadingView(View view) {
+//        ((PullableRecyclerView) pullableView).customizeLoadingView(view);
+//    }
+//
+//    public void customizeErrorView(View view) {
+//        ((PullableRecyclerView) pullableView).customizeErrorView(view);
+//    }
 
 
 }

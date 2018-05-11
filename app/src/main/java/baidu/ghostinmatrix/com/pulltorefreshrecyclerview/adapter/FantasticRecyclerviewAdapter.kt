@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.R
+import java.util.*
 
 /**
  * Created by ghostinmatrix on 2018/5/9.
@@ -31,20 +32,20 @@ const val Anim_RIGHT: Int = 0x0002
 annotation class AnimType
 
 abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, private val layoutId: Int,
-                                               private var emptyLayoutId: Int = -1, private val datas: List<E>? = null) : RecyclerView.Adapter<ComViewHolderKt>() {
+                                               private val datas: List<E>? = null) : RecyclerView.Adapter<ComViewHolderKt>() {
     private var firstItemAnimPosition: Int = 0
     private var mData: ArrayList<E> = ArrayList()
     private val mHeader = ArrayList<Int>()
     private val mFooter = ArrayList<Int>()
     private var selectedAnim = Anim_NONE
+    private var stickHeaderFooter = false
+    private var emptyLayoutId = R.layout.common_empty
     
     init {
         datas?.let {
             mData.addAll(datas)
         }
-        if (emptyLayoutId == -1) {
-            emptyLayoutId = R.layout.common_empty
-        }
+        
     }
     
     fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
@@ -62,6 +63,17 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
         mFooter.addAll(footers)
         return this
     }
+    
+    fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
+        stickHeaderFooter = isStick
+        return this
+    }
+    
+    fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
+        emptyLayoutId = emptyViewId
+        return this
+    }
+    
     
     override fun onViewAttachedToWindow(holder: ComViewHolderKt) {
         if (holder.layoutPosition >= firstItemAnimPosition) {
@@ -90,13 +102,14 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
         }
     }
     
-    fun setData(group: ArrayList<E>) {
-        mData = group
+    fun refreshData(group: ArrayList<E>) {
+        mData.clear()
+        mData.addAll(group)
         firstItemAnimPosition = 0
         notifyDataSetChanged()
     }
     
-    fun appendGroup(append: List<E>?) {
+    fun appendData(append: List<E>?) {
         append?.let {
             mData.addAll(append)
             notifyDataSetChanged()
@@ -134,12 +147,54 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
     
     abstract fun convert(viewHolderKt: ComViewHolderKt, data: E, type: Int, position: Int)
     
+    //这个地方，如果mData.isEmpty，有两宗可能，1：删除光，这样会导致数组越界；2.压根就是空。所以要考虑昨天的crash场景。
+    //详见recyclerView 5419行。
+    override fun getItemCount(): Int {
+        var count = 0
+        if (mData.isEmpty()) {
+            count = if (stickHeaderFooter) {
+                mHeader.size + 1 + mFooter.size
+            } else {
+                1
+            }
+        } else {
+            count = mHeader.size + mData.size + mFooter.size
+        }
+        return count
+    }
     
-    override fun getItemCount(): Int = if (mData.isEmpty()) 1 else mHeader.size + mData.size + mFooter.size
+    fun removeItem(holder: ComViewHolderKt) {
+        val position = holder.layoutPosition
+        if (mData.isNotEmpty() && position >= mHeader.size && position < mHeader.size + mData.size) {
+            mData.removeAt(position - mHeader.size)
+            if (mData.isEmpty() && !stickHeaderFooter) {
+                notifyItemRangeRemoved(0, mHeader.size + 1 + mFooter.size)
+            } else
+                notifyItemRemoved(position)
+        }
+    }
+    
+    fun topItem(holder: ComViewHolderKt) {
+        val position = holder.layoutPosition
+        if (mData.isNotEmpty() && position >= mHeader.size && position < mHeader.size + mData.size) {
+            val theData = mData.removeAt(position - mHeader.size)
+            mData.add(0, theData)
+            notifyItemMoved(position, mHeader.size)
+        }
+    }
     
     override fun getItemViewType(position: Int): Int {
+        
         return if (mData.isEmpty()) {
-            EMPTY
+            if (stickHeaderFooter) {
+                when {
+                    position < mHeader.size -> HEADER + position + 1
+                    position > mHeader.size -> FOOTER + (position + 1 - mHeader.size - 1)
+                    else -> EMPTY
+                }
+            } else {
+                EMPTY
+            }
         } else {
             when {
                 position < mHeader.size -> HEADER + position + 1

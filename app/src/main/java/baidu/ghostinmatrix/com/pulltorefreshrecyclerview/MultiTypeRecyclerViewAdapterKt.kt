@@ -7,6 +7,8 @@ import android.view.ViewGroup
 /**
  * Created by ghostinmatrix on 2018/2/28.
  */
+@Deprecated("Try to use FantasticRecyclerviewAdapter, which is simpler to replace the combination of these adapters",
+        ReplaceWith("FantasticRecyclerviewAdapter"), DeprecationLevel.ERROR)
 abstract class MultiTypeRecyclerViewAdapterKt<E>(ctx: Context, multiTypeSupport: MultiTypeSupport<E>) : ComRecyclerViewAdapterKt<E>(ctx, -1) {
     private var mMultiTypeSupport: MultiTypeSupport<E> = multiTypeSupport
     

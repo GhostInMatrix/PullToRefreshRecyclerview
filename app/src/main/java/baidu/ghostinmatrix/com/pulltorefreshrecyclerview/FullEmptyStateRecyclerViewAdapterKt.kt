@@ -1,15 +1,15 @@
 package baidu.ghostinmatrix.com.pulltorefreshrecyclerview
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ItemTouchHelperAdapter
 
 /**
  * Created by ghostinmatrix on 2018/2/28.
+ *  @see baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.FantasticRecyclerviewAdapter
  */
+@Deprecated("Try to use FantasticRecyclerviewAdapter, which is simpler to replace the combination of these adapters",
+        ReplaceWith("FantasticRecyclerviewAdapter"), DeprecationLevel.ERROR)
 class FullEmptyStateRecyclerViewAdapterKt<E>(private val innerAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>, private val emptyView: View)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ItemTouchHelperAdapter {
     private val emptyType = -10000

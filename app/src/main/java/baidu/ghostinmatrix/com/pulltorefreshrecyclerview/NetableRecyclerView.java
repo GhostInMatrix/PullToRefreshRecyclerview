@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 /**
  * Created by shanjie on 2017/3/29.
  */
+@Deprecated
 public class NetableRecyclerView extends RelativeLayout {
     private Context mContext;
     protected RecyclerView mRecyclerView;
