@@ -49,33 +49,55 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
         
     }
     
-     fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
+    /**
+     * choose on of a @AnimType as each Data Item anim when first attached to Window
+     * @see AnimType
+     */
+    fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
         selectedAnim = animType
         return this
     }
     
-     fun headers(headers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+    /**
+     * customize headers as needed
+     */
+    fun headers(headers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
         mHeader.addAll(headers)
         return this
     }
     
-    
-     fun footers(footers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+    /**
+     * customize footers as needed
+     */
+    fun footers(footers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
         mFooter.addAll(footers)
         return this
     }
     
-     fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
+    
+    /**
+     * choose if the EmptyView will cover the headers and footers or not
+     * true is not cover
+     */
+    fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
         stickHeaderFooter = isStick
         return this
     }
     
-     fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
+    /**
+     * customize emptyView when adapter as no data
+     */
+    fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
         emptyLayoutId = emptyViewId
         return this
     }
     
-     fun multiTypeHelper(multiTypeHelper: MultitypeHelper): FantasticRecyclerviewAdapter<E> {
+    /**
+     * support multiType itemViews if pass a MultitypeHelper in to adapter
+     *  @see MultitypeHelper
+     *  cannot use {singleTypeLayoutId} at same time
+     */
+    fun multiTypeHelper(multiTypeHelper: MultitypeHelper): FantasticRecyclerviewAdapter<E> {
         if (layoutId != -1) {
             throw Exception("already set singleTypeLayoutId, cannot turn it into a MultitypeAdapter")
         }
@@ -83,7 +105,11 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
         return this
     }
     
-     fun singleTypeLayoutId(layoutId: Int): FantasticRecyclerviewAdapter<E> {
+    /**
+     * if itemView has only one layout, just use it!
+     * cannot use {multiTypeHelper} at same time
+     */
+    fun singleTypeLayoutId(layoutId: Int): FantasticRecyclerviewAdapter<E> {
         if (multiTypeHelper != null) {
             throw Exception("already set multiTypeHelper, cannot turn it into a SingleTypeAdapter")
         }
@@ -104,7 +130,7 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
         return mData.isNotEmpty() && holder.layoutPosition >= mHeader.size && holder.layoutPosition < mHeader.size + mData.size
     }
     
-    fun startAnim(view: View) {
+    private fun startAnim(view: View) {
         when (selectedAnim) {
             Anim_LEFTIN -> {
                 val anim = ObjectAnimator.ofFloat(view, "translationX", -view.rootView.width.toFloat(), 0f).setDuration(200)
@@ -133,13 +159,13 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
         }
     }
     
-    override fun getItemId(position: Int): Long {
-        return getItemIdFromData(mData[position - mHeader.size])
-    }
-    
-    fun getItemIdFromData(data: E): Long {
-        return RecyclerView.NO_ID
-    }
+//    override fun getItemId(position: Int): Long {
+//        return getItemIdFromData(mData[position - mHeader.size])
+//    }
+//
+//    fun getItemIdFromData(data: E): Long {
+//        return RecyclerView.NO_ID
+//    }
     
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ComViewHolderKt {
         return when {
@@ -168,8 +194,6 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
     
     abstract fun convert(viewHolderKt: ComViewHolderKt, data: E, type: Int, position: Int)
     
-    //这个地方，如果mData.isEmpty，有两宗可能，1：删除光，这样会导致数组越界；2.压根就是空。所以要考虑昨天的crash场景。
-    //详见recyclerView 5419行。
     override fun getItemCount(): Int {
         var count = 0
         if (mData.isEmpty()) {
