@@ -101,18 +101,4 @@ public class PullToRefreshRecyclerView extends PullToRefreshLayout {
     public PullableRecyclerView getPullableRecyclerView() {
         return (PullableRecyclerView) pullableView;
     }
-
-//    public void customizeEmptyView(View view) {
-//        ((PullableRecyclerView) pullableView).customizeEmptyView(view);
-//    }
-//
-//    public void customizeLoadingView(View view) {
-//        ((PullableRecyclerView) pullableView).customizeLoadingView(view);
-//    }
-//
-//    public void customizeErrorView(View view) {
-//        ((PullableRecyclerView) pullableView).customizeErrorView(view);
-//    }
-
-
 }

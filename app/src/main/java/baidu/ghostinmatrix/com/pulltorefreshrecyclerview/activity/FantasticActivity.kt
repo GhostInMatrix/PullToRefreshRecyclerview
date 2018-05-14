@@ -13,12 +13,13 @@ import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullToRefreshRecyclerVi
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.R
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.Anim_LEFTIN
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.FantasticRecyclerviewAdapter
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.MultitypeHelper
 
 /**
  * Created by ghostinmatrix on 2018/5/9.
  */
 class FantasticActivity : Activity(), PullToRefreshLayout.OnRefreshListener {
-    private lateinit var adapter: FantasticRecyclerviewAdapter<String>
+    private lateinit var adapter: FantasticRecyclerviewAdapter<Any>
     private lateinit var recyclerView: PullToRefreshRecyclerView
     override fun onRefresh(pullToRefreshLayout: PullToRefreshLayout?) {
         adapter.refreshData(arrayListOf("1", "2", "3", "4", "5", "6"))
@@ -42,10 +43,15 @@ class FantasticActivity : Activity(), PullToRefreshLayout.OnRefreshListener {
         setContentView(R.layout.activity_fantastic)
         recyclerView = findViewById<PullToRefreshRecyclerView>(R.id.recyclerView)
         recyclerView.setOnRefreshListener(this)
-        adapter = object : FantasticRecyclerviewAdapter<String>(this, R.layout.test_item_content_list) {
-            override fun convert(viewHolderKt: ComViewHolderKt, data: String, type: Int, position: Int) {
+        adapter = object : FantasticRecyclerviewAdapter<Any>(this) {
+            override fun convert(viewHolderKt: ComViewHolderKt, data: Any, type: Int, position: Int) {
                 val titleTv = viewHolderKt.getView<TextView>(R.id.title)
-                titleTv.text = data
+                if (type == 1) {
+                    titleTv.text = data as String
+                } else {
+                    titleTv.text = "数字：" + data as Int
+                }
+                
                 val delBtn = viewHolderKt.getView<Button>(R.id.delete)
                 delBtn.setOnClickListener { _ ->
                     removeItem(viewHolderKt)
@@ -57,14 +63,30 @@ class FantasticActivity : Activity(), PullToRefreshLayout.OnRefreshListener {
                 }
             }
         }
+//                .singleTypeLayoutId(R.layout.test_item_content_list)
+                .multiTypeHelper(object : MultitypeHelper {
+                    override fun getDataItemViewType(position: Int, data: Any): Int {
+                        if (data is String) {
+                            return 1
+                        } else
+                            return 2
+                    }
+                    
+                    override fun getLayoutId(dataItemViewType: Int): Int {
+                        if (dataItemViewType == 1) {
+                            return R.layout.test_item_content_list
+                        } else
+                            return R.layout.test_item_content_list2
+                    }
+                })
                 .anim(Anim_LEFTIN)
                 .headers(arrayListOf(R.layout.test_header, R.layout.test_header, R.layout.header_search_view))
                 .footers(arrayListOf(R.layout.test_footer, R.layout.test_footer))
-                .stickHeaderFooter(true)
+                .stickHeaderFooter(false)
                 .emptyView(R.layout.common_error)
         
         recyclerView.adapter = adapter
-        val data = arrayListOf("aaa", "bb", "cc", "dd", "ee", "ff", "gg")
+        val data = arrayListOf("aaa", "bb", "cc", "dd", "ee", "ff", "gg", 1, 2, 3, 4, 5, 65)
         adapter.refreshData(data)
     }
 }

@@ -31,8 +31,7 @@ const val Anim_RIGHT: Int = 0x0002
 @Retention(AnnotationRetention.SOURCE)
 annotation class AnimType
 
-abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, private val layoutId: Int,
-                                               private val datas: List<E>? = null) : RecyclerView.Adapter<ComViewHolderKt>() {
+abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Context, private val datas: List<E>? = null) : RecyclerView.Adapter<ComViewHolderKt>() {
     private var firstItemAnimPosition: Int = 0
     private var mData: ArrayList<E> = ArrayList()
     private val mHeader = ArrayList<Int>()
@@ -40,6 +39,8 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
     private var selectedAnim = Anim_NONE
     private var stickHeaderFooter = false
     private var emptyLayoutId = R.layout.common_empty
+    private var multiTypeHelper: MultitypeHelper? = null
+    private var layoutId: Int = -1
     
     init {
         datas?.let {
@@ -48,29 +49,45 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
         
     }
     
-    fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
+     fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
         selectedAnim = animType
         return this
     }
     
-    fun headers(headers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+     fun headers(headers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
         mHeader.addAll(headers)
         return this
     }
     
     
-    fun footers(footers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+     fun footers(footers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
         mFooter.addAll(footers)
         return this
     }
     
-    fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
+     fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
         stickHeaderFooter = isStick
         return this
     }
     
-    fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
+     fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
         emptyLayoutId = emptyViewId
+        return this
+    }
+    
+     fun multiTypeHelper(multiTypeHelper: MultitypeHelper): FantasticRecyclerviewAdapter<E> {
+        if (layoutId != -1) {
+            throw Exception("already set singleTypeLayoutId, cannot turn it into a MultitypeAdapter")
+        }
+        this.multiTypeHelper = multiTypeHelper
+        return this
+    }
+    
+     fun singleTypeLayoutId(layoutId: Int): FantasticRecyclerviewAdapter<E> {
+        if (multiTypeHelper != null) {
+            throw Exception("already set multiTypeHelper, cannot turn it into a SingleTypeAdapter")
+        }
+        this.layoutId = layoutId
         return this
     }
     
@@ -84,7 +101,7 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
     }
     
     private fun isData(holder: ComViewHolderKt): Boolean {
-        return getItemViewType(holder.layoutPosition) == DATA
+        return mData.isNotEmpty() && holder.layoutPosition >= mHeader.size && holder.layoutPosition < mHeader.size + mData.size
     }
     
     fun startAnim(view: View) {
@@ -134,13 +151,17 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
                 ComViewHolderKt.getComViewHolder(context, mFooter[viewType - FOOTER - 1], parent)
             }
             else -> {
-                ComViewHolderKt.getComViewHolder(context, layoutId, parent)
+                if (multiTypeHelper != null) {
+                    ComViewHolderKt.getComViewHolder(context, multiTypeHelper!!.getLayoutId(viewType), parent)
+                } else {
+                    ComViewHolderKt.getComViewHolder(context, layoutId, parent)
+                }
             }
         }
     }
     
     override fun onBindViewHolder(holder: ComViewHolderKt, position: Int) {
-        if (getItemViewType(position) == DATA) {
+        if (isData(holder)) {
             convert(holder, mData[position - mHeader.size], getItemViewType(position), position)
         }
     }
@@ -199,9 +220,13 @@ abstract class FantasticRecyclerviewAdapter<E>(private val context: Context, pri
             when {
                 position < mHeader.size -> HEADER + position + 1
                 position >= mHeader.size + mData.size -> FOOTER + position + 1 - mHeader.size - mData.size
-                else -> DATA
+                else -> {
+                    return multiTypeHelper?.getDataItemViewType(position, mData[position - mHeader.size])
+                            ?: DATA
+                }
             }
         }
     }
+    
     
 }

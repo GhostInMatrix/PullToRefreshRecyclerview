@@ -8,3 +8,4 @@ public interface MultiTypeSupport<T> {
 
     public int getLayoutId(int itemViewType);
 }
+

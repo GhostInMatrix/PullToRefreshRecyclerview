@@ -119,6 +119,7 @@ public class PullToRefreshLayout extends RelativeLayout {
         if (disposable != null && !disposable.isDisposed())
             disposable.dispose();
         disposable = Flowable.interval(5, TimeUnit.MILLISECONDS)
+                .onBackpressureDrop()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Long>() {
