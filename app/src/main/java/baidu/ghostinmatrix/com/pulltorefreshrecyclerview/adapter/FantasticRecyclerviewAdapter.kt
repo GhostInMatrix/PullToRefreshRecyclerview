@@ -7,19 +7,19 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.R
 import java.util.*
 
 /**
  * Created by ghostinmatrix on 2018/5/9.
  */
+const val NOTHING: Int = 0
 const val EMPTY: Int = 10000
 const val HEADER: Int = 20000
 const val FOOTER: Int = 30000
 const val DATA: Int = 40000
 
-@IntDef(EMPTY, HEADER, FOOTER, DATA)
+@IntDef(NOTHING, EMPTY, HEADER, FOOTER, DATA)
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType
 
@@ -31,7 +31,8 @@ const val Anim_RIGHT: Int = 0x0002
 @Retention(AnnotationRetention.SOURCE)
 annotation class AnimType
 
-abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Context, private val datas: List<E>? = null) : RecyclerView.Adapter<ComViewHolderKt>() {
+abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Context, private val func: ((viewHolderKt: ComViewHolderKt, data: E, type: Int, position: Int) -> Unit)? = null, private val datas: List<E>? = null)
+    : RecyclerView.Adapter<ComViewHolderKt>() {
     private var firstItemAnimPosition: Int = 0
     private var mData: ArrayList<E> = ArrayList()
     private val mHeader = ArrayList<Int>()
@@ -39,60 +40,57 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
     private var selectedAnim = Anim_NONE
     private var stickHeaderFooter = false
     private var emptyLayoutId = R.layout.common_empty
-    private var multiTypeHelper: MultitypeHelper? = null
-    private var layoutId: Int = -1
+    private var viewTypeHelper: ViewtypeHelper? = null
+    private var isAdapterInited: Boolean = false
+    private var isNeedInitStatus: Boolean = true
     
     init {
         datas?.let {
             mData.addAll(datas)
+            isAdapterInited = true
         }
     }
     
     /**
      * choose on of a @AnimType as each Data Item anim when first attached to Window
      * @see AnimType
-     * 选择一个itemView的入场动画
      */
-    fun anim(@AnimType animType: Int): FantasticRecyclerviewAdapter<E> {
+    fun setAnim(@AnimType animType: Int) {
         selectedAnim = animType
-        return this
     }
     
     /**
      * 自定义headers的resources
      */
-    fun headers(headers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+    fun setHeaders(headers: ArrayList<Int>) {
         mHeader.addAll(headers)
-        return this
     }
     
     /**
      * 自定义footer的Resource
      */
-    fun footers(footers: ArrayList<Int>): FantasticRecyclerviewAdapter<E> {
+    fun setFooters(footers: ArrayList<Int>) {
         mFooter.addAll(footers)
-        return this
+    }
+    
+    fun clearFooters() {
+        mFooter.clear()
     }
     
     
     /**
      * choose if the EmptyView will cover the headers and footers or not
-     * true if not cover
-     * 可选择，空页面盖住header和footer，还是空页面在header和footer之间。
-     * true 为之间。
+     * true is not cover
      */
-    fun stickHeaderFooter(isStick: Boolean): FantasticRecyclerviewAdapter<E> {
+    fun setStickHeaderFooter(isStick: Boolean) {
         stickHeaderFooter = isStick
-        return this
     }
     
     /**
-     * customize emptyView when adapter has no data
-     * 自定义空页面，如果adapter内没有数据时，会自动展示
+     * customize emptyView when adapter as no data
      */
-    fun emptyView(emptyViewId: Int): FantasticRecyclerviewAdapter<E> {
+    fun setEmptyView(emptyViewId: Int) {
         emptyLayoutId = emptyViewId
-        return this
     }
     
     /**
@@ -100,24 +98,22 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
      *  @see MultitypeHelper
      *  cannot use {singleTypeLayoutId} at same time
      */
-    fun multiTypeHelper(multiTypeHelper: MultitypeHelper): FantasticRecyclerviewAdapter<E> {
-        if (layoutId != -1) {
-            throw Exception("already set singleTypeLayoutId, cannot turn it into a MultitypeAdapter")
-        }
-        this.multiTypeHelper = multiTypeHelper
-        return this
+    fun setViewTypeHelper(viewTypeHelper: ViewtypeHelper) {
+        this.viewTypeHelper = viewTypeHelper
     }
     
     /**
-     * if itemView has only one layout, just use it!
-     * cannot use {multiTypeHelper} at same time
+     * 设置是否需要展示初始态的背景（全白，而非空页面）
+     * @param need true,则初始态背景全白，需要调用数据相关API才会根据数据状态展示对应view
+     * @see refreshData
+     * @see appendData
+     * @see appendOneData
+     * @see init{}
+     *
+     * @param need false, 则初始态就是empty view
      */
-    fun singleTypeLayoutId(layoutId: Int): FantasticRecyclerviewAdapter<E> {
-        if (multiTypeHelper != null) {
-            throw Exception("already set multiTypeHelper, cannot turn it into a SingleTypeAdapter")
-        }
-        this.layoutId = layoutId
-        return this
+    fun setNeedInitStatus(need: Boolean) {
+        this.isNeedInitStatus = need
     }
     
     
@@ -149,40 +145,40 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
     }
     
     /**
-     * usually used when pull down to refresh
      * 一般用于下拉刷新，清空[mData]重新注入
      * [mData]是Adapter内部容器，data所在的外部列表不会被持有
      */
-    fun refreshData(group: List<E>) {
+    fun refreshData(group: List<E>?) {
+        isAdapterInited = true
         mData.clear()
-        mData.addAll(group)
+        group?.let { mData.addAll(it) }
         firstItemAnimPosition = 0
         notifyDataSetChanged()
     }
     
     /**
-     * append a list of data,usually used when pull up to load
      * 一般用于分页加载，追加即可。
      */
     fun appendData(append: List<E>?) {
+        isAdapterInited = true
         append?.let {
             mData.addAll(append)
             notifyDataSetChanged()
         }
     }
     
-    /**
-     * append a single data element
-     * 新增单一数据
-     */
-    fun appendAData(element: E) {
+    fun appendOneData(element: E) {
+        isAdapterInited = true
         mData.add(element)
         notifyDataSetChanged()
     }
     
+    
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComViewHolderKt {
         return when {
-            viewType == EMPTY -> ComViewHolderKt.getComViewHolder(context, emptyLayoutId, parent)
+            viewType == EMPTY -> {
+                ComViewHolderKt.getComViewHolder(context, emptyLayoutId, parent)
+            }
             viewType > HEADER && viewType <= (HEADER + mHeader.size) -> {
                 ComViewHolderKt.getComViewHolder(context, mHeader[viewType - HEADER - 1], parent)
             }
@@ -190,10 +186,11 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
                 ComViewHolderKt.getComViewHolder(context, mFooter[viewType - FOOTER - 1], parent)
             }
             else -> {
-                if (multiTypeHelper != null) {
-                    ComViewHolderKt.getComViewHolder(context, multiTypeHelper!!.getLayoutId(viewType), parent)
+                if (viewTypeHelper?.getLayoutView(viewType, parent) != null) {
+                    ComViewHolderKt.getComViewHolder(viewTypeHelper?.getLayoutView(viewType, parent))
                 } else {
-                    ComViewHolderKt.getComViewHolder(context, layoutId, parent)
+                    ComViewHolderKt.getComViewHolder(context, viewTypeHelper?.getLayoutId(viewType)
+                            ?: 0, parent)
                 }
             }
         }
@@ -205,10 +202,13 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
         }
     }
     
-    abstract fun convert(viewHolderKt: ComViewHolderKt, data: E, type: Int, position: Int)
+    open fun convert(viewHolderKt: ComViewHolderKt, data: E, type: Int, position: Int) {
+        func?.invoke(viewHolderKt, data, type, position)
+    }
+    
     
     /**
-     * 得到真实数据的数量，不包括header/footer/empty等
+     * 得到真实数据的总量，不包括header/footer/empty等
      */
     public fun getDataCount(): Int {
         return mData.size
@@ -220,16 +220,30 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
      * @see getDataCount
      */
     override fun getItemCount(): Int {
-        var count = 0
-        if (mData.isEmpty()) {
-            count = if (stickHeaderFooter) {
-                mHeader.size + 1 + mFooter.size
+        var count = if (isNeedInitStatus) {
+            if (!isAdapterInited)
+                0
+            else if (mData.isEmpty()) {
+                if (stickHeaderFooter) {
+                    mHeader.size + 1 + mFooter.size
+                } else {
+                    1
+                }
             } else {
-                1
+                mHeader.size + mData.size + mFooter.size
             }
         } else {
-            count = mHeader.size + mData.size + mFooter.size
+            if (mData.isEmpty()) {
+                if (stickHeaderFooter) {
+                    mHeader.size + 1 + mFooter.size
+                } else {
+                    1
+                }
+            } else {
+                mHeader.size + mData.size + mFooter.size
+            }
         }
+        
         return count
     }
     
@@ -276,7 +290,7 @@ abstract class FantasticRecyclerviewAdapter<E : Any>(private val context: Contex
                 position < mHeader.size -> HEADER + position + 1
                 position >= mHeader.size + mData.size -> FOOTER + position + 1 - mHeader.size - mData.size
                 else -> {
-                    return multiTypeHelper?.getDataItemViewType(position, mData[position - mHeader.size])
+                    return viewTypeHelper?.getDataItemViewType(mData[position - mHeader.size])
                             ?: DATA
                 }
             }

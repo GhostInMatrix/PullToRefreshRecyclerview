@@ -6,14 +6,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullToRefreshLayout
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullToRefreshLayout.SUCCEED
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.PullToRefreshRecyclerView
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.R
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.Anim_LEFTIN
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.ComViewHolderKt
 import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.FantasticRecyclerviewAdapter
-import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.MultitypeHelper
+import baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter.ViewtypeHelper
 
 /**
  * Created by ghostinmatrix on 2018/5/9.
@@ -63,28 +63,26 @@ class FantasticActivity : Activity(), PullToRefreshLayout.OnRefreshListener {
                 }
             }
         }
-//                .singleTypeLayoutId(R.layout.test_item_content_list)
-                .multiTypeHelper(object : MultitypeHelper {
-                    override fun getDataItemViewType(position: Int, data: Any): Int {
-                        if (data is String) {
-                            return 1
-                        } else
-                            return 2
-                    }
-                    
-                    override fun getLayoutId(dataItemViewType: Int): Int {
-                        if (dataItemViewType == 1) {
-                            return R.layout.test_item_content_list
-                        } else
-                            return R.layout.test_item_content_list2
-                    }
-                })
-                .anim(Anim_LEFTIN)
-                .headers(arrayListOf(R.layout.test_header, R.layout.test_header, R.layout.header_search_view))
-                .footers(arrayListOf(R.layout.test_footer, R.layout.test_footer))
-                .stickHeaderFooter(false)
-                .emptyView(R.layout.common_error)
-        
+        adapter.setViewTypeHelper(object : ViewtypeHelper {
+            override fun getDataItemViewType(data: Any): Int {
+                if (data is String) {
+                    return 1
+                } else
+                    return 2
+            }
+            
+            override fun getLayoutId(dataItemViewType: Int): Int {
+                if (dataItemViewType == 1) {
+                    return R.layout.test_item_content_list
+                } else
+                    return R.layout.test_item_content_list2
+            }
+        })
+        adapter.setAnim(Anim_LEFTIN)
+        adapter.setHeaders(arrayListOf(R.layout.test_header, R.layout.test_header, R.layout.header_search_view))
+        adapter.setFooters(arrayListOf(R.layout.test_footer, R.layout.test_footer))
+        adapter.setStickHeaderFooter(false)
+        adapter.setNeedInitStatus(false)
         recyclerView.adapter = adapter
         val data = arrayListOf("aaa", "bb", "cc", "dd", "ee", "ff", "gg", 1, 2, 3, 4, 5, 65)
         adapter.refreshData(data)

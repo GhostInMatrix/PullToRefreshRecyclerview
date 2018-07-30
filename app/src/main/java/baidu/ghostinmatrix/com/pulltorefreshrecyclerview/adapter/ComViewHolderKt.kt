@@ -1,5 +1,4 @@
-package baidu.ghostinmatrix.com.pulltorefreshrecyclerview
-
+package baidu.ghostinmatrix.com.pulltorefreshrecyclerview.adapter
 import android.content.Context
 import android.support.v4.util.SparseArrayCompat
 import android.support.v7.widget.RecyclerView
@@ -10,9 +9,9 @@ import android.view.ViewGroup
 /**
  * Created by ghostinmatrix on 2018/2/28.
  */
-class ComViewHolderKt(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ComViewHolderKt(itemView: View?) : RecyclerView.ViewHolder(itemView) {
     private val mViews: SparseArrayCompat<View> = SparseArrayCompat()
-    private val convertView: View = itemView
+    private val convertView: View? = itemView
     private var tag: String = ""
     
     fun setTag(tag: String) {
@@ -29,15 +28,16 @@ class ComViewHolderKt(itemView: View) : RecyclerView.ViewHolder(itemView) {
             return ComViewHolderKt(itemView)
         }
         
-        fun getComViewHolder(context: Context, itemView: View, parent: ViewGroup): ComViewHolderKt {
+        fun getComViewHolder(itemView: View?): ComViewHolderKt {
             return ComViewHolderKt(itemView)
         }
     }
     
-    fun <T : View> getView(layoutId: Int): T {
+    fun <T : View?> getView(layoutId: Int): T {
         var view = mViews.get(layoutId)
+        
         if (view == null) {
-            view = convertView.findViewById(layoutId)
+            view = convertView?.findViewById(layoutId)
             mViews.put(layoutId, view)
         }
         return view as T
